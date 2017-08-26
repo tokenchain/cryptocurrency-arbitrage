@@ -118,7 +118,7 @@ $(window).load(function () {
     $('#header').show();
 
 
-    let socket = io('https://ccarbitrage.azurewebsites.net/');
+    let socket = io('http://localhost:3000/');
 
     let numberOfLoads = 0; //Number of final results loads
     let numberOfMLoads = 0; //Number of Market loadss

@@ -8,8 +8,13 @@
 console.log('Starting app...');
 
 const request = require('request'), Promise = require("bluebird"); //request for pulling JSON from api. Bluebird for Promises.
+const express = require('express');
+const app = express(), 
+    helmet = require('helmet'), 
+    http = require('http').Server(app), 
+    io = require('socket.io')(http); // For websocket server functionality
 
-const app = require('express')(), helmet = require('helmet'), http = require('http').Server(app), io = require('socket.io')(http); // For websocket server functionality
+app.use(express.static('./frontend'));
 app.use(helmet.hidePoweredBy({setTo: 'PHP/5.4.0'}));
 // app.use(cors({credentials: false}));
 const port = process.env.PORT || 3000;
@@ -85,7 +90,22 @@ function computePrices(data) {
                 });
                 for (let i = 0; i < arr.length; i++) {
                     for (let j = i + 1; j < arr.length; j++) {
-                        results.push([coin, arr[i][0] / arr[j][0], arr[i][0], arr[j][0], arr[i][1], arr[j][1] ], [coin, arr[j][0] / arr[i][0], arr[j][0], arr[i][0], arr[j][1], arr[i][1]]);
+                        results.push(
+                            [
+                                coin, 
+                                arr[i][0] / arr[j][0], 
+                                arr[i][0], arr[j][0], 
+                                arr[i][1], arr[j][1] 
+                            ], 
+                            [
+                                coin, 
+                                arr[j][0] / arr[i][0], 
+                                arr[j][0], 
+                                arr[i][0], 
+                                arr[j][1], 
+                                arr[i][1]
+                            ]
+                        );
                     }
                 }
 
