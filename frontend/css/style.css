@@ -1347,8 +1347,8 @@ h1, h2, h3, h4, h5, h6 {
 
 #service .service-tab .badhon-tab li a {
     color: #9FA9A9;
-    padding-top: 23px;
-    padding-bottom: 17px;
+    /*padding-top: 23px;
+    padding-bottom: 17px;*/
     font-size: 20px;
     display: block;
     padding-right: 10px;
@@ -1457,7 +1457,7 @@ a.remove-all {
 
 .coin {
     display: flex;
-    min-height: 74px;
+    min-height: 36px;
     justify-content: flex-start;
     align-items: center; /* align vertical */
 }
@@ -1479,6 +1479,8 @@ a.remove-all {
     font-size : 0.5em;
     font-weight: 200;
     text-transform: none;
+    margin-left: 5px;
+}
 }
 .coin-info h1 {
     display: block;
@@ -1495,7 +1497,7 @@ a.remove-all {
     letter-spacing: 3px;
 }
 .coin-info-high {
-    margin : 20px 0;
+    margin : 20px 0 0;
     padding: 20px 0 10px 20px;
     border-left : 10px solid #5DCA88;
 }
@@ -1507,25 +1509,27 @@ a.remove-all {
     letter-spacing: 3px;
 }
 .coin-info-low {
-    margin : 20px 0;
+    margin : 0px 0px 20px;
     padding: 20px 0 10px 20px;
     border-left : 10px solid #39c;
 }
 i.cc {
-    font-size : 50px;
+    font-size : 26px;
 
 }
 
 .remove {
-    margin-left : 30px;
+    /*margin-left : 30px;*/
+    font-size: 10px;
+    color: lightcoral;
 }
 .coin-name {
 
     margin: 0;
     display: inline-block;
-    font-size : 30px;
+    font-size : 18px;
     vertical-align: middle;
-    padding : 0 20px 0 10px;
+    padding : 0 20px 0 0;
 }
 
 .coin-names-list, .market-names-list {
@@ -1538,7 +1542,7 @@ i.cc {
 
 .coin-markets {
     margin: 0;
-    font-size : 25px;
+    font-size : 18px;
     padding : 0 30px;
     text-transform: capitalize;
 }
