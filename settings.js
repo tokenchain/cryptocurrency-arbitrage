@@ -25,7 +25,7 @@
 
 let markets = [
     require('./exchanges/bittrex'),
-    //    require('./exchanges/btc38'),
+    // require('./exchanges/btc38'),
     //    require('./exchanges/jubi'),
     require('./exchanges/poloniex'),
     require('./exchanges/cryptopia'),

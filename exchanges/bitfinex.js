@@ -1,6 +1,22 @@
 module.exports = (function() {
     "use strict";
 
+/*
+[
+    SYMBOL,
+    BID, 
+    BID_SIZE, 
+    ASK, 
+    ASK_SIZE, 
+    DAILY_CHANGE, 
+    DAILY_CHANGE_PERC, 
+    LAST_PRICE, 
+    VOLUME, 
+    HIGH, 
+    LOW
+],
+*/
+
     return {
         marketName: 'bitfinex', 
         URL: 'https://api.bitfinex.com/v2/tickers?symbols=tDASHBTC,tEOSBTC,tGNOBTC,tETCBTC,tETHBTC,tLTCBTC,tMLNBTC,tREPBTC,tXDGBTC,tXLMBTC,tXMRBTC,tXRPBTC,tZECBTC', //URL To Fetch API From.
@@ -8,23 +24,24 @@ module.exports = (function() {
         pairURL : '',
         lastPrice: function (data, coin_prices) { //Get the last price of coins in JSON data
             return new Promise(function (res, rej) {
+
+                //console.log(data)
+                
                 try {
-                    for (let key in data.result) {
-                        let arr = key.match(/DASH|EOS|GNO|ETC|ETH|LTC|MLN|REP|XDG|XLM|XMR|XRP|ZEC/); // matching real names to weird kraken api coin pairs like "XETCXXBT" etc 
-                        let name = key;
-                        let matchedName = arr[0];
-                        if (matchedName === "XDG") { //kraken calls DOGE "XDG" for whatever reason
-                            let matchedName = "DOGE";
-                            var coinName = matchedName;
-                        } else {
-                            var coinName = matchedName;
-                        }
+                    for (let coin of data) {
+                        
+                        console.log(coin)
+                        
+                        let coinName = coin[0].substring(1).replace('BTC','').toUpperCase();
+                        let price = coin[7];
 
                         if (!coin_prices[coinName]) coin_prices[coinName] = {};
-                        
-                        coin_prices[coinName].kraken = data.result[name].c[0];
 
+                        coin_prices[coinName]["bitfinex"] = price;
                     }
+
+console.log(coin_prices)
+
                     res(coin_prices);
 
                 }
@@ -32,7 +49,6 @@ module.exports = (function() {
                     console.log(err);
                     rej(err);
                 }
-
             })
         },
     }
