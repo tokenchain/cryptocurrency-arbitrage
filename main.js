@@ -51,7 +51,7 @@ function getMarketData(options, coin_prices, callback) { //GET JSON DATA
 
                     let newCoinPrices;
 
-                    newCoinPrices = options.last(data, coin_prices, options.toBTCURL);
+                    newCoinPrices = options.lastPrice(data, coin_prices, options.toBTCURL);
                     numberOfRequests++;
                     if (numberOfRequests >= 1) computePrices(coin_prices);
                     resolve(newCoinPrices);
@@ -115,7 +115,7 @@ function computePrices(data) {
             return a[1] - b[1];
         });
 
-        io.emit('news', results);
+        io.emit('results', results);
     }
 }
 
