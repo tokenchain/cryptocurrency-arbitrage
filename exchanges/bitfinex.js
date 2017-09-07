@@ -30,8 +30,6 @@ module.exports = (function() {
                 try {
                     for (let coin of data) {
                         
-                        console.log(coin)
-                        
                         let coinName = coin[0].substring(1).replace('BTC','').toUpperCase();
                         let price = coin[7];
 
@@ -39,8 +37,6 @@ module.exports = (function() {
 
                         coin_prices[coinName]["bitfinex"] = price;
                     }
-
-console.log(coin_prices)
 
                     res(coin_prices);
 
