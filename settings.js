@@ -32,6 +32,7 @@ let markets = [
     require('./exchanges/bleutrade'),
     require('./exchanges/kraken'),
     require('./exchanges/bitfinex'),
+    require('./exchanges/therocktrading'),
 ];
 
 let marketNames = [];
