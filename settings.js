@@ -28,11 +28,11 @@ let markets = [
     // require('./exchanges/btc38'),
     //    require('./exchanges/jubi'),
     require('./exchanges/poloniex'),
-    require('./exchanges/cryptopia'),
-    require('./exchanges/bleutrade'),
-    require('./exchanges/kraken'),
-    require('./exchanges/bitfinex'),
+    // require('./exchanges/cryptopia'),
+    // require('./exchanges/bleutrade'),
+    // require('./exchanges/kraken'),
     require('./exchanges/therocktrading'),
+    require('./exchanges/bitfinex'),
 ];
 
 let marketNames = [];

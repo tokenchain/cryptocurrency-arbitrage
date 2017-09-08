@@ -14,6 +14,8 @@ const app = express(),
     http = require('http').Server(app), 
     io = require('socket.io')(http); // For websocket server functionality
 
+const pino = require('pino')()
+
 app.use(express.static('./frontend'));
 app.use(helmet.hidePoweredBy({setTo: 'PHP/5.4.0'}));
 // app.use(cors({credentials: false}));
@@ -32,6 +34,8 @@ http.listen(port, function () {
 require('./settings.js')(); //Includes settings file.
 
 let coinNames = [];
+let opportunities = [];
+
 io.on('connection', function (socket) {
     socket.emit('coinsAndMarkets', [marketNames, coinNames]);
     socket.emit('results', results);
@@ -53,7 +57,10 @@ function getMarketData(options, coin_prices, callback) { //GET JSON DATA
 
                     newCoinPrices = options.lastPrice(data, coin_prices, options.toBTCURL);
                     numberOfRequests++;
-                    if (numberOfRequests >= 1) computePrices(coin_prices);
+
+                    if (numberOfRequests >= 1) { 
+                        computePrices(coin_prices);
+                    }
                     resolve(newCoinPrices);
 
                 }
@@ -80,7 +87,6 @@ function computePrices(data) {
             if (Object.keys(data[coin]).length > 1){
                 if(coinNames.includes(coin) == false) coinNames.push(coin);
 
-
             let arr = [];
                 for (let market in data[coin]) {
                     arr.push([data[coin][market], market]);
@@ -88,24 +94,27 @@ function computePrices(data) {
                 arr.sort(function (a, b) {
                     return a[0] - b[0];
                 });
+
                 for (let i = 0; i < arr.length; i++) {
                     for (let j = i + 1; j < arr.length; j++) {
-                        results.push(
-                            [
+
+                        var movement = [];
+                        if (arr[i][0] / arr[j][0] > 1) {
+                            movement = [
                                 coin, 
                                 arr[i][0] / arr[j][0], 
                                 arr[i][0], arr[j][0], 
                                 arr[i][1], arr[j][1] 
-                            ], 
-                            [
+                            ]
+                        } else {
+                            movement = [
                                 coin, 
                                 arr[j][0] / arr[i][0], 
-                                arr[j][0], 
-                                arr[i][0], 
-                                arr[j][1], 
-                                arr[i][1]
-                            ]
-                        );
+                                arr[j][0], arr[i][0], 
+                                arr[j][1], arr[i][1]
+                            ]                            
+                        }
+                        results.push(movement);
                     }
                 }
 
@@ -115,8 +124,32 @@ function computePrices(data) {
             return a[1] - b[1];
         });
 
+        results = results.filter(function(value, index, arr) {
+            return value[1]>=1.003
+        });
+
+        if (Object.keys(results).length > 0) {
+            for (var idx in results) {
+                console.log(results[idx][5]+' -> '+results[idx][4]+' ('+(results[idx][1]-1).toFixed(3)+'%)');
+            }
+        }
+
+//        pino.info(results)
+
         io.emit('results', results);
     }
+}
+
+
+function logToFile(results) {
+    console.log('uodda')
+    var fs = require('fs');
+    var stream = fs.createWriteStream("my_file.txt");
+    stream.once('open', function(fd) {
+      stream.write("My first row\n");
+      stream.write("My second row\n");
+      stream.end();
+    });    
 }
 
 
@@ -130,10 +163,11 @@ function computePrices(data) {
     await Promise.all(arrayOfRequests.map(p => p.catch(e => e)))
 
         .then(results => computePrices(coin_prices))
+        .then(results => logToFile(results))
 
         .catch(e => console.log(e));
 
-    setTimeout(main, 10000);
+    setTimeout(main, 1000);
 })();
 
 // .then(v => {

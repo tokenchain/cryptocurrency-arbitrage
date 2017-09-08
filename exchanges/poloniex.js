@@ -10,9 +10,12 @@ module.exports = (function() {
             return new Promise(function (res, rej) {
                 try {
                     for (var obj in data) {
-                        if(obj.includes('BTC_')&&obj!=="BTC_EMC2") {
+                        if(obj.includes('BTC_ETH') && obj!=="BTC_EMC2") {
+                            
                             let coinName = obj.replace("BTC_", '');
+                            
                             if (!coin_prices[coinName]) coin_prices[coinName] = {};
+                            
                             coin_prices[coinName].poloniex = data[obj].last;
                         }
                     }

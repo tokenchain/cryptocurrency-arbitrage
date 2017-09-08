@@ -10,7 +10,7 @@ module.exports = (function() {
             return new Promise(function (res, rej) {
                 try {
                     for (let obj of data.result) {
-                        if(obj["MarketName"].includes('BTC-')) {
+                        if(obj["MarketName"].includes('BTC-ETH')) {
                             let coinName = obj["MarketName"].replace("BTC-", '');
                             if (!coin_prices[coinName]) coin_prices[coinName] = {};
                             coin_prices[coinName].bittrex = obj.Last;

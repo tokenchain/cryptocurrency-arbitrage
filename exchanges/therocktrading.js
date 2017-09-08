@@ -11,7 +11,7 @@ module.exports = (function() {
                 try {
                     for (var coin of data['tickers']) {
 
-                        if(coin.fund_id.includes('BTC')) {
+                        if(coin.fund_id.includes('ETHBTC')) {
                             let coinName = coin.fund_id.replace('BTC','').toUpperCase();
                             let price = coin['last'];
 

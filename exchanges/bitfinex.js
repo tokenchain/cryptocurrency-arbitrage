@@ -19,7 +19,7 @@ module.exports = (function() {
 
     return {
         marketName: 'bitfinex', 
-        URL: 'https://api.bitfinex.com/v2/tickers?symbols=tDASHBTC,tEOSBTC,tGNOBTC,tETCBTC,tETHBTC,tLTCBTC,tMLNBTC,tREPBTC,tXDGBTC,tXLMBTC,tXMRBTC,tXRPBTC,tZECBTC', //URL To Fetch API From.
+        URL: 'https://api.bitfinex.com/v2/tickers?symbols=tETHBTC', //URL To Fetch API From.
         toBTCURL: false, //URL, if needed for an external bitcoin price api.
         pairURL : '',
         lastPrice: function (data, coin_prices) { //Get the last price of coins in JSON data
