@@ -4,7 +4,7 @@
   "description": "An arbitrage bot",
   "main": "main.js",
   "engines": {
-    "node": "8.0.0"
+    "node": "8.2.0"
   },
   "dependencies": {
     "bluebird": "^3.5.0",
@@ -18,8 +18,8 @@
   },
   "scripts": {
     "preinstall": "npm install pm2 -g",
-    "test": "node main",
-    "start": "pm2 start main.js --attach --max-memory-restart 50M --interpreter=~/.nvm/versions/node/v8.2.0/bin/node"
+    "test": "mocha test/**/**.spec.js",
+    "start": "node src/main.js"
   },
   "repository": {
     "type": "git",
@@ -34,5 +34,11 @@
   "bugs": {
     "url": "https://github.com/manu354/crypto-arbitrage/issues"
   },
-  "homepage": "manu354.github.io/cryptocurrency-arbitrage"
+  "homepage": "manu354.github.io/cryptocurrency-arbitrage",
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "lodash": "^4.17.4",
+    "mocha": "^3.5.3",
+    "webpack-dev-server": "^2.7.1"
+  }
 }

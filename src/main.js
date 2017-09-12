@@ -7,6 +7,7 @@
 
 console.log('Starting app...');
 
+const path = require('path');
 const request = require('request'), Promise = require("bluebird"); //request for pulling JSON from api. Bluebird for Promises.
 const express = require('express');
 const app = express(), 
@@ -14,6 +15,7 @@ const app = express(),
     http = require('http').Server(app), 
     io = require('socket.io')(http); // For websocket server functionality
 const time = require('time');
+
 
 // create a file only file logger
 const log = require('simple-node-logger')
@@ -34,7 +36,7 @@ http.listen(port, function () {
 });
 
 
-require('./settings.js')(); //Includes settings file.
+require('./config/settings.js')(); //Includes settings file.
 
 let coinNames = [];
 let opportunities = [];
