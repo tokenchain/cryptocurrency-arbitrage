@@ -10,15 +10,11 @@ module.exports = (function() {
             return new Promise(function (res, rej) {
                 try {
                     for (let key in data.result) {
-                        let arr = key.match(/DASH|EOS|GNO|ETC|ETH|ICN|LTC|MLN|REP|XDG|XLM|XMR|XRP|ZEC/); // matching real names to weird kraken api coin pairs like "XETCXXBT" etc 
+                        let arr = key.match(/ETH/); // matching real names to weird kraken api coin pairs like "XETCXXBT" etc 
                         let name = key;
                         let matchedName = arr[0];
-                        if (matchedName === "XDG") { //kraken calls DOGE "XDG" for whatever reason
-                            let matchedName = "DOGE";
-                            var coinName = matchedName;
-                        } else {
-                            var coinName = matchedName;
-                        }
+
+                        var coinName = matchedName;
 
                         if (!coin_prices[coinName]) coin_prices[coinName] = {};
                         
