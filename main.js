@@ -13,6 +13,7 @@ const app = express(),
     helmet = require('helmet'), 
     http = require('http').Server(app), 
     io = require('socket.io')(http); // For websocket server functionality
+const time = require('time');
 
 // create a file only file logger
 const log = require('simple-node-logger')
@@ -151,10 +152,12 @@ function prepareNewOrders(results, trades, threshold)
     if (Object.keys(results).length > 0) {
 
         for (var idx in results) {
-            let fee  = ( 0.002 + 0.002 )
+            let feePerc  = ( 0.002 + 0.002 )
             let key = results[idx][0]+'-'+results[idx][5]+'-'+results[idx][4]
             let diffValue = results[idx][2] - results[idx][3]
             let diffPerc = threshold - 1
+            let fee1 = results[idx][2] * 0.002
+            let fee2 = results[idx][3] * 0.002
 
             let data = {
                 'buy': {
@@ -170,13 +173,13 @@ function prepareNewOrders(results, trades, threshold)
                     'exchSell': 0.002
                 },
                 'earning': {
-                        'value': (diffValue * diffPerc).toFixed(8),
+                        'value': diffValue.toFixed(8),
                         'perc': diffPerc.toFixed(3) + '%'
                 },
-                'fee': fee,
+                'fee': feePerc,
                 'profit': {
-                    'value': (diffValue * ( diffPerc - fee )).toFixed(8),
-                    'perc': (diffPerc - fee).toFixed(3) + '%'
+                    'value': (diffValue - ( fee1 + fee2 )).toFixed(8),
+                    'perc': (diffPerc - feePerc).toFixed(3) + '%'
                 }
             }
 
@@ -219,10 +222,11 @@ function prepareClosingOrders(results, trades, threshold)
 
 function submitNewOrders(trades) 
 {
-    console.log('submitNewOrders orders', trades.openOrders)
-    
     if (Object.keys(trades.openOrders).length > 0) {
-        console.log('orders in submitNewOrders',trades.openOrders)
+        //console.log('orders in submitNewOrders',trades.openOrders)
+            
+        var now = new time.Date();
+        now.setTimezone('Europe/Rome')
         
         let keys = Object.keys(trades.openOrders)
         
@@ -230,7 +234,7 @@ function submitNewOrders(trades)
             // launches the order creating a position
             trades.positions[idx] = trades.openOrders[idx]
 
-            log.info('OPEN ARB: ',trades.openOrders[idx])
+            log.info(now.toString(), ' OPEN ARB: ',trades.openOrders[idx])
 
             delete trades.openOrders[idx]
         }
@@ -244,13 +248,16 @@ function closePositions(trades)
     
     if (Object.keys(trades.openOrders).length > 0) {
         console.log('orders in closePositions',trades.closeOrders)
-        
+            
+        var now = new time.Date();
+        now.setTimezone('Europe/Rome')
+
         let keys = Object.keys(trades.closeOrders)
         
         for (let idx of keys) {
             // CLOSE ARB POSITIONS: HERE WE GOT MONEYS!!!
             console.log('CLOSE ARB: ',idx)
-            log.info('CLOSE ARB: ',trades.positions[idx])
+            log.info(now.toString(), ' CLOSE ARB: ',trades.positions[idx])
 
             delete trades.positions[idx]
             delete trades.closeOrders[idx]
@@ -262,8 +269,13 @@ function closePositions(trades)
 function logSituation(trades) 
 {
     if (!trades) return;
+    
+    var now = new time.Date();
+    now.setTimezone('Europe/Rome')
 
     console.log('-----------------')
+    console.log(now.toString())
+    console.log('--------')
     console.log('open orders', trades.openOrders)
     console.log('--------')
     console.log('close orders', trades.closeOrders)
