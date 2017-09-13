@@ -173,8 +173,8 @@ function prepareOpeningOrders(results, trades, threshold)
                     'exch': results[idx][4]
                 },
                 'fee': {
-                    'exchBuy': feePerc1,
-                    'exchSell': feePerc2
+                    'exchBuy': feePerc1 * 100,
+                    'exchSell': feePerc2 * 100
                 },
                 'earning': {
                         'value': diffValue.toFixed(8),
