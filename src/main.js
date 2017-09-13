@@ -48,7 +48,7 @@ io.on('connection', function (socket) {
 
 // coinPrices is an object with data on price differences between markets. = {BTC : {market1 : 2000, market2: 4000, p : 2}, } (P for percentage difference)
 // results is a 2D array with coin name and percentage difference, sorted from low to high.
-let coinPrices = {}, trades = { openOrders: {}, closeOrders: {}, positions: {}}, numberOfRequests = 0, results = []; // GLOBAL variables to get pushed to browser.
+let coinPrices = {}, trades = { openOrders: {}, closeOrders: {}, positions: {}, profit: 0}, numberOfRequests = 0, results = []; // GLOBAL variables to get pushed to browser.
 
 function getMarketData(options, coinPrices, callback) 
 { //GET JSON DATA
@@ -138,11 +138,11 @@ function computePrices(data)
 }
 
 
-function prepareNewOrders(results, trades, threshold) 
+function prepareOpeningOrders(results, trades, threshold) 
 {
     // console.log(results)
 
-    // console.log('trades in prepareNewOrders',trades);
+    // console.log('trades in prepareOpeningOrders',trades);
 
     results = results.filter(function(value, index, arr) {
         return value[1] >= threshold
@@ -154,12 +154,14 @@ function prepareNewOrders(results, trades, threshold)
     if (Object.keys(results).length > 0) {
 
         for (var idx in results) {
-            let feePerc  = ( 0.002 + 0.002 )
+            let feePerc1  = 0.0025
+            let feePerc2  = 0.0025
+            let feePerc  = ( feePerc1 + feePerc2 )
             let key = results[idx][0]+'-'+results[idx][5]+'-'+results[idx][4]
             let diffValue = results[idx][2] - results[idx][3]
             let diffPerc = threshold - 1
-            let fee1 = results[idx][2] * 0.002
-            let fee2 = results[idx][3] * 0.002
+            let fee1 = results[idx][2] * feePerc1
+            let fee2 = results[idx][3] * feePerc2
 
             let data = {
                 'buy': {
@@ -171,8 +173,8 @@ function prepareNewOrders(results, trades, threshold)
                     'exch': results[idx][4]
                 },
                 'fee': {
-                    'exchBuy': 0.002,
-                    'exchSell': 0.002
+                    'exchBuy': feePerc1,
+                    'exchSell': feePerc2
                 },
                 'earning': {
                         'value': diffValue.toFixed(8),
@@ -189,7 +191,7 @@ function prepareNewOrders(results, trades, threshold)
                 trades.openOrders[key] = data;
             }
         }   
-        console.log('prepareNewOrders orders', trades.openOrders)
+        //console.log('prepareOpeningOrders orders', trades.openOrders)
     }
 
 }
@@ -210,10 +212,10 @@ function prepareClosingOrders(results, trades, threshold)
             if (Object.keys(trades.positions).indexOf(key) >= 0) {
 
                 console.log('CLOSED ARBITRAGE ORDER', key)
-                log.info('CLOSED ARBITRAGE ORDER', trades.positions[idx])
+                log.info('CLOSED ARBITRAGE ORDER', trades.positions[key])
 
                 // ORDER CLOSE
-                trades.closeOrders[key] = trades.positions[idx]
+                trades.closeOrders[key] = trades.positions[key]
             }
         }
     }
@@ -222,10 +224,10 @@ function prepareClosingOrders(results, trades, threshold)
 }
 
 
-function submitNewOrders(trades) 
+function openPositions(trades) 
 {
     if (Object.keys(trades.openOrders).length > 0) {
-        //console.log('orders in submitNewOrders',trades.openOrders)
+        //console.log('orders in openPositions',trades.openOrders)
             
         var now = new time.Date();
         now.setTimezone('Europe/Rome')
@@ -248,7 +250,7 @@ function closePositions(trades)
 {
     console.log('closePositions orders', trades.closeOrders)
     
-    if (Object.keys(trades.openOrders).length > 0) {
+    if (Object.keys(trades.closeOrders).length > 0) {
         console.log('orders in closePositions',trades.closeOrders)
             
         var now = new time.Date();
@@ -259,8 +261,9 @@ function closePositions(trades)
         for (let idx of keys) {
             // CLOSE ARB POSITIONS: HERE WE GOT MONEYS!!!
             console.log('CLOSE ARB: ',idx)
-            log.info(now.toString(), ' CLOSE ARB: ',trades.positions[idx])
+            log.info(now.toString(), ' CLOSE ARB: ',trades.positions[idx], " with profit ",trades.positions[idx].profit.value)
 
+            trades.profit += Number(trades.positions[idx].profit.value)
             delete trades.positions[idx]
             delete trades.closeOrders[idx]
         }
@@ -283,6 +286,8 @@ function logSituation(trades)
     console.log('close orders', trades.closeOrders)
     console.log('--------')
     console.log('positions', trades.positions)
+    console.log('--------')
+    console.log('profit', trades.profit)
     console.log('-----------------')
 }
 
@@ -300,13 +305,13 @@ function logSituation(trades)
     
         .then( results => computePrices(coinPrices) )
 
-        .then( prepareClosingOrders(results, trades, 1.001) )
+        .then( prepareClosingOrders(results, trades, 1.0005) )
         
         .then( closePositions(trades) )
 
-        .then( prepareNewOrders(results, trades, 1.004) )
+        .then( prepareOpeningOrders(results, trades, 1.006) )
 
-        .then( submitNewOrders(trades) )
+        .then( openPositions(trades) )
 
         .then( logSituation(trades) )
 
