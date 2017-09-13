@@ -229,16 +229,13 @@ function openPositions(trades)
     if (Object.keys(trades.openOrders).length > 0) {
         //console.log('orders in openPositions',trades.openOrders)
             
-        var now = new time.Date();
-        now.setTimezone('Europe/Rome')
-        
         let keys = Object.keys(trades.openOrders)
         
         for (let idx of keys) {
             // launches the order creating a position
             trades.positions[idx] = trades.openOrders[idx]
 
-            log.info(now.toString(), ' OPEN ARB: ',trades.openOrders[idx])
+            log.info('OPEN ARB: ', idx, ' - ', trades.openOrders[idx])
 
             delete trades.openOrders[idx]
         }
@@ -253,15 +250,12 @@ function closePositions(trades)
     if (Object.keys(trades.closeOrders).length > 0) {
         console.log('orders in closePositions',trades.closeOrders)
             
-        var now = new time.Date();
-        now.setTimezone('Europe/Rome')
-
         let keys = Object.keys(trades.closeOrders)
         
         for (let idx of keys) {
             // CLOSE ARB POSITIONS: HERE WE GOT MONEYS!!!
             console.log('CLOSE ARB: ',idx)
-            log.info(now.toString(), ' CLOSE ARB: ',trades.positions[idx], " with profit ",trades.positions[idx].profit.value)
+            log.info('CLOSE ARB: ', idx, ' - ', trades.positions[idx], " with profit ",trades.positions[idx].profit.value)
 
             trades.profit += Number(trades.positions[idx].profit.value)
             delete trades.positions[idx]
