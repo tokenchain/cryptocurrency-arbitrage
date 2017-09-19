@@ -1,11 +1,9 @@
 /**
- * Created by Manu Masson on 6/27/2017.
+ * Created by Marco Radossi on 11/10/2017.
  *
  */
 
 'use strict';
-
-console.log('Starting app...');
 
 const path = require('path');
 const request = require('request'), Promise = require("bluebird"); //request for pulling JSON from api. Bluebird for Promises.
@@ -15,11 +13,17 @@ const app = express(),
     http = require('http').Server(app), 
     io = require('socket.io')(http); // For websocket server functionality
 const time = require('time');
-
+const clui = require('clui'),
+    clc = require('cli-color'),
+    LineBuffer = clui.LineBuffer,
+    Line = clui.Line
+    ;
 
 // create a file only file logger
-const log = require('simple-node-logger')
-                .createSimpleFileLogger('output/arb.log');
+const log = require('simple-node-logger').createSimpleFileLogger('output/arb.log');
+
+
+log.info('Starting app...');
 
 app.use(express.static('./frontend'));
 app.use(helmet.hidePoweredBy({setTo: 'PHP/5.4.0'}));
@@ -32,7 +36,7 @@ app.get('/', function (req, res) {
 
 
 http.listen(port, function () {
-    console.log('listening on', port);
+    log.info('listening on', port);
 });
 
 
@@ -76,7 +80,7 @@ function getMarketData(options, coinPrices, callback)
                 }
 
             } catch (error) {
-                console.log("Error getting JSON response from", options.URL, error); //Throws error
+                log.info("Error getting JSON response from", options.URL, error); //Throws error
                 reject(error);
             }
 
@@ -140,16 +144,10 @@ function computePrices(data)
 
 function prepareOpeningOrders(results, trades, threshold) 
 {
-    // console.log(results)
-
-    // console.log('trades in prepareOpeningOrders',trades);
-
     results = results.filter(function(value, index, arr) {
         return value[1] >= threshold
     });
 
-    console.log('new orders count with threshold ', threshold, ': ', Object.keys(results).length)
-    
     // gets only "good" values to start an arb. with
     if (Object.keys(results).length > 0) {
 
@@ -191,7 +189,6 @@ function prepareOpeningOrders(results, trades, threshold)
                 trades.openOrders[key] = data;
             }
         }   
-        //console.log('prepareOpeningOrders orders', trades.openOrders)
     }
 
 }
@@ -211,7 +208,6 @@ function prepareClosingOrders(results, trades, threshold)
         
             if (Object.keys(trades.positions).indexOf(key) >= 0) {
 
-                console.log('CLOSED ARBITRAGE ORDER', key)
                 log.info('CLOSED ARBITRAGE ORDER', trades.positions[key])
 
                 // ORDER CLOSE
@@ -220,14 +216,12 @@ function prepareClosingOrders(results, trades, threshold)
         }
     }
 
-    console.log('prepareClosingOrders orders', trades.closeOrders)
 }
 
 
 function openPositions(trades) 
 {
     if (Object.keys(trades.openOrders).length > 0) {
-        //console.log('orders in openPositions',trades.openOrders)
             
         let keys = Object.keys(trades.openOrders)
         
@@ -245,16 +239,13 @@ function openPositions(trades)
 
 function closePositions(trades) 
 {
-    console.log('closePositions orders', trades.closeOrders)
     
     if (Object.keys(trades.closeOrders).length > 0) {
-        console.log('orders in closePositions',trades.closeOrders)
             
         let keys = Object.keys(trades.closeOrders)
         
         for (let idx of keys) {
             // CLOSE ARB POSITIONS: HERE WE GOT MONEYS!!!
-            console.log('CLOSE ARB: ',idx)
             log.info('CLOSE ARB: ', idx, ' - ', trades.positions[idx], " with profit ",trades.positions[idx].profit.value)
 
             trades.profit += Number(trades.positions[idx].profit.value)
@@ -271,18 +262,122 @@ function logSituation(trades)
     
     var now = new time.Date();
     now.setTimezone('Europe/Rome')
+    
+    var outputBuffer = new LineBuffer({
+        x: 0,
+        y: 0,
+        width: 'console',
+        height: 'console'
+    });
+    
+    new Line(outputBuffer)
+        .column('ARBiter ['+now.toLocaleTimeString()+']', 20, [clc.green])
+        .column('Profit: ', 10, [clc.green])
+        .column((trades.profit).toFixed(8)+' BTC', 20, [clc.green])
+        .fill()
+        .store();
 
-    console.log('-----------------')
-    console.log(now.toString())
-    console.log('--------')
-    console.log('open orders', trades.openOrders)
-    console.log('--------')
-    console.log('close orders', trades.closeOrders)
-    console.log('--------')
-    console.log('positions', trades.positions)
-    console.log('--------')
-    console.log('profit', trades.profit)
-    console.log('-----------------')
+    new Line(outputBuffer)
+        .fill()
+        .store();
+
+    new Line(outputBuffer)
+        .padding(2)
+        .column('#', 4, [clc.red])
+        .column('Broker', 20, [clc.green])
+        .column('Price', 16, [clc.green])
+        .column('State', 8, [clc.green])
+        .fill()
+        .store();
+    
+    if (coinPrices['ETH']) {
+        let keys = Object.keys(coinPrices['ETH'])
+        
+        for (let idx in keys) {
+            
+            let exchange = keys[idx]
+            let price = ''+coinPrices['ETH'][exchange]
+            new Line(outputBuffer)
+                .padding(2)
+                .column(idx, 4)
+                .column(exchange, 20)
+                .column(price, 16)
+                .column('ok', 8)
+                .fill()
+                .store();
+        }
+    }
+
+    new Line(outputBuffer)
+        .fill()
+        .store();
+
+    if (trades.positions) {
+        new Line(outputBuffer)
+            .column('Open Positions', 20, [clc.green])
+            .fill()
+            .store();
+
+        new Line(outputBuffer)
+            .column('#', 4, [clc.red])
+            .column('Action', 8, [clc.green])
+            .column('Broker', 20, [clc.green])
+            .column('Price', 16, [clc.green])
+            .column('Fee', 6, [clc.green])
+            .fill()
+            .store();
+            
+        let idx = 0
+        for (let coin in trades.positions) {
+            let position = trades.positions[coin]
+
+            new Line(outputBuffer)
+                .column(''+idx, 4)
+                .column('BUY', 8)
+                .column(position.buy.exch, 20)
+                .column(''+position.buy.price, 16)
+                .column('0.25%', 6)
+                .fill()
+                .store();
+            new Line(outputBuffer)
+                .column(''+idx, 4)
+                .column('SELL', 8)
+                .column(position.sell.exch, 20)
+                .column(''+position.sell.price, 16)
+                .column('0.25%', 6)
+                .fill()
+                .store();
+            new Line(outputBuffer)
+                .column(''+idx, 4)
+                .column('GAIN', 8)
+                .column('', 20)
+                .column(''+(position.sell.price - position.buy.price).toFixed(8), 16)
+                .column(''+(position.sell.price/position.buy.price - 1).toFixed(2)+'%', 6)
+                .fill()
+                .store();
+            new Line(outputBuffer)
+                .fill()
+                .store();
+        
+        
+            idx+=1
+        }        
+    }
+        
+    new Line(outputBuffer)
+        .fill()
+        .store();
+
+    new Line(outputBuffer)
+        .column('Dimensioni:', 16)
+        .column(''+outputBuffer.width() + 'x' + outputBuffer.height(), 10)
+        .fill()
+        .store();
+
+    //outputBuffer.fill();
+    outputBuffer.output();
+    
+    // console.log(trades)
 }
 
 
@@ -293,6 +388,7 @@ function logSituation(trades)
         arrayOfRequests.push(getMarketData(markets[i], coinPrices));
     }
 
+        
     // process.stdout.write(".");
 
     await Promise.all(arrayOfRequests.map(p => p.catch(e => e)))

@@ -28,18 +28,34 @@ let markets = [
     // require('../exchanges/btc38'),
     //    require('../exchanges/jubi'),
     require('../exchanges/poloniex'),
-    // require('../exchanges/cryptopia'),
     // require('../exchanges/bleutrade'),
-    // require('../exchanges/kraken'),
-    require('../exchanges/therocktrading'),
+    //require('../exchanges/kraken'),
     require('../exchanges/bitfinex'),
+    require('../exchanges/therocktrading'),
+    require('../exchanges/cexio'),
+    require('../exchanges/gdax'),
+    // funzionante ma poche transazioni require('../exchanges/gatecoin'),
+    require('../exchanges/hitbtc'),
+    // funzionante ma poche transazioni require('../exchanges/quoine'),
+    require('../exchanges/exmo'),
+    require('../exchanges/binance'),
+    require('../exchanges/tidex'),
+    require('../exchanges/gemini'),
+    require('../exchanges/liqui'),
+    require('../exchanges/bitflyer'),
+    //require('../exchanges/shapeshift'), //https://shapeshift.io/marketinfo/eth_btc
+    //require('../exchanges/okcoin'),
+    //require('../exchanges/bitflyer'),
+    //require('../exchanges/bitstamp'),
+    //require('../exchanges/bitinstant'),
+    //require('../exchanges/bitbay'),
 ];
 
 let marketNames = [];
-for(let i = 0; i < markets.length; i++) { // Loop except cryptowatch
+for(let i = 0; i < markets.length; i++) { 
     marketNames.push([[markets[i].marketName], [markets[i].pairURL]]);
 }
-console.log("Markets:", marketNames);
+
 module.exports = function () {
     this.markets = markets;
     this.marketNames = marketNames;
