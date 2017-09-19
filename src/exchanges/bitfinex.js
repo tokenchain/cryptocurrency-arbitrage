@@ -30,6 +30,10 @@ module.exports = (function() {
                 try {
                     for (let coin of data) {
                         
+                        if (!coin) {
+                            // SET EXCHANGE STATE TO FAILED
+                        }
+
                         let coinName = coin[0].substring(1).replace('BTC','').toUpperCase();
                         let price = coin[7];
 
@@ -42,7 +46,7 @@ module.exports = (function() {
 
                 }
                 catch (err) {
-                    console.log(err);
+                    console.error(err);
                     rej(err);
                 }
             })
