@@ -414,5 +414,5 @@ function logSituation(trades)
 
         .catch(e => console.log(e));
 
-    setTimeout(main, 2000);
+    setTimeout(main, 4000);
 })();
