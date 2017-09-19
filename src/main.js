@@ -56,11 +56,18 @@ let coinPrices = {}, trades = { openOrders: {}, closeOrders: {}, positions: {}, 
 
 function getMarketData(options, coinPrices, callback) 
 { //GET JSON DATA
+    
     return new Promise(function (resolve, reject) {
-        request(options.URL, function (error, response, body) {
+        let opts = {
+            'url': options.URL,
+            'headers': {
+              'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36'
+            }
+        };
+
+        request(opts, function (error, response, body) {
             try {
                 let data = JSON.parse(body);
-                //console.log("Success", options.marketName);
                 
                 if (options.marketName) {
 
