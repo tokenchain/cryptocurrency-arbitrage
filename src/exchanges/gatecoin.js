@@ -2,7 +2,7 @@ module.exports = (function() {
     "use strict";
 
     return{
-        marketName: 'kraken', // kraken has no one size fits all market summery so each pair has to be entered as param in GET - will need to add new coins as they are added to exchange
+        marketName: 'gatecoin', // kraken has no one size fits all market summery so each pair has to be entered as param in GET - will need to add new coins as they are added to exchange
         URL: 'https://api.gatecoin.com/Public/LiveTickers', //URL To Fetch API From.
         toBTCURL: false, //URL, if needed for an external bitcoin price api.
         pairURL : '',

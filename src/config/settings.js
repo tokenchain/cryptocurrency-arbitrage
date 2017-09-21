@@ -43,6 +43,7 @@ let markets = [
     require('../exchanges/gemini'),
     require('../exchanges/liqui'),
     require('../exchanges/bitflyer'),
+    // cina solo su yen require('../exchanges/coinone'),
     //require('../exchanges/shapeshift'), //https://shapeshift.io/marketinfo/eth_btc
     //require('../exchanges/okcoin'),
     //require('../exchanges/bitflyer'),
