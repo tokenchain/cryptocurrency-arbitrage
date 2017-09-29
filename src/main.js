@@ -1,7 +1,7 @@
 /**
  * Created by Marco Radossi on 11/10/2017.
  *
- */
+ *
 
 'use strict';
 
@@ -416,3 +416,4 @@ function logSituation(trades)
 
     setTimeout(main, 4000);
 })();
+//*/
