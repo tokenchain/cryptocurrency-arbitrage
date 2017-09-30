@@ -7,7 +7,7 @@ module.exports = (function() {
         toBTCURL: false,
         pairURL : '',
         lastPrice: function (data, coin_prices) { //Where to find the last price of coin in JSON data
-            return new Promise(function (res, rej) {
+            // return new Promise(function (res, rej) {
                 try {
                     for (let obj of data.result) {
                         if(obj["MarketName"].includes('BTC-ETH')) {
@@ -16,14 +16,14 @@ module.exports = (function() {
                             coin_prices[coinName].bittrex = obj.Last;
                         }
                     }
-                    res(coin_prices);
+                    return(coin_prices);
                 }
                 catch (err) {
                     console.log(err);
-                    rej(err);
+                    // rej(err);
                 }
 
-            })
+            // })
         },
 
     }

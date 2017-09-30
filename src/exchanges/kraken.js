@@ -8,7 +8,7 @@ module.exports = (function() {
         toBTCURL: false, //URL, if needed for an external bitcoin price api.
         pairURL : '',
         lastPrice: function (data, coin_prices) { //Get the last price of coins in JSON data
-            return new Promise(function (res, rej) {
+            // return new Promise(function (res, rej) {
                 try {
                     for (let name in data.result) {
                         let arr = name.match(/ETH/); // matching real names to weird kraken api coin pairs like "XETCXXBT" etc 
@@ -19,15 +19,15 @@ module.exports = (function() {
                         coin_prices[coinName].kraken = data.result[name].c[0];
 
                     }
-                    res(coin_prices);
+                    return(coin_prices);
 
                 }
                 catch (err) {
                     console.log(err);
-                    rej(err);
+                    // rej(err);
                 }
 
-            })
+            // })
         },
     }
 })();

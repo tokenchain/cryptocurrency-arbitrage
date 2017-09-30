@@ -7,7 +7,7 @@ module.exports = (function() {
         toBTCURL: false,
         pairURL : '',
         lastPrice: function (data, coin_prices) { //Where to find the last price of coin in JSON data
-            return new Promise(function (res, rej) {
+            // return new Promise(function (res, rej) {
                 try {
                     for (var obj in data) {
                         if(obj.includes('BTC_ETH') && obj!=="BTC_EMC2") {
@@ -19,14 +19,14 @@ module.exports = (function() {
                             coin_prices[coinName].poloniex = data[obj].last;
                         }
                     }
-                    res(coin_prices);
+                    return(coin_prices);
                 }
                 catch (err) {
                     console.log(err);
-                    rej(err);
+                    // rej(err);
                 }
 
-            })
+            // })
         },
 
     }
