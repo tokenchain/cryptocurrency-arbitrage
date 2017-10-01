@@ -9,8 +9,9 @@ import {Promise} from 'bluebird'
 import request from 'request'
 
 import {ExchangeComponent} from '../src/components/exchange'
-import {UpdatingComponent} from '../src/components/updating'
 import {PairValueComponent} from '../src/components/pair_value'
+import {UpdatingStateComponent} from '../src/components/updating_state'
+import {ReadyStateComponent} from '../src/components/ready_state'
 
 import {ExchangeGetCoinsValuesSystem} from '../src/systems/exchange_get_coins_values'
 import {ShowCoinsValuesSystem} from '../src/systems/show_coins_values'
@@ -23,10 +24,11 @@ let world = new World()
 
 world.component('exchange', ExchangeComponent )
 world.component('pairValue', PairValueComponent )
-// world.component('updateCoinCommand', DoUpdateCoinValueCommand )
+world.component('readyState', ReadyStateComponent )
+world.component('updatingState', UpdatingStateComponent )
 
+world.system(['pairValue','readyState'], ShowCoinsValuesSystem)
 world.system(['exchange'], ExchangeGetCoinsValuesSystem)
-world.system(['pairValue'], ShowCoinsValuesSystem)
 
 createExchangesEntities(markets)
 createCoinsEntities(markets)
@@ -68,9 +70,9 @@ function createCoinsEntities(markets)
             .set('pairValue', {
                 mainCoin: 'ETH',
                 baseCoin: 'BTC',
-                value: null,
-                state: 'init' 
+                value: null
             })
+            .set('updatingState')
             .set(markets[idx].marketName)
     }
 }

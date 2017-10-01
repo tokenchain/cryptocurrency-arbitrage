@@ -4,7 +4,6 @@ class PairValue {
         this.mainCoin = data.mainCoin
         this.baseCoin = data.baseCoin
         this.value = data.value
-        this.state = data.status
     }
 }
 

@@ -4,7 +4,8 @@ class ShowCoinsValuesSystem {
     }
     
     every(pair) {
-        console.log(pair)
+        console.log('show')
+        // console.log(pair)
     }
 }
 

@@ -14,9 +14,11 @@ var _request2 = _interopRequireDefault(_request);
 
 var _exchange = require('../src/components/exchange');
 
-var _updating = require('../src/components/updating');
-
 var _pair_value = require('../src/components/pair_value');
+
+var _updating_state = require('../src/components/updating_state');
+
+var _ready_state = require('../src/components/ready_state');
 
 var _exchange_get_coins_values = require('../src/systems/exchange_get_coins_values');
 
@@ -24,16 +26,19 @@ var _show_coins_values = require('../src/systems/show_coins_values');
 
 var _settings = require('../src/config/settings');
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+    return obj && obj.__esModule ? obj : { default: obj };
+}
 
 var world = new _picoes.World();
 
 world.component('exchange', _exchange.ExchangeComponent);
 world.component('pairValue', _pair_value.PairValueComponent);
-// world.component('updateCoinCommand', DoUpdateCoinValueCommand )
+world.component('readyState', _ready_state.ReadyStateComponent);
+world.component('updatingState', _updating_state.UpdatingStateComponent);
 
+world.system(['pairValue', 'readyState'], _show_coins_values.ShowCoinsValuesSystem);
 world.system(['exchange'], _exchange_get_coins_values.ExchangeGetCoinsValuesSystem);
-world.system(['pairValue'], _show_coins_values.ShowCoinsValuesSystem);
 
 createExchangesEntities(_settings.markets);
 createCoinsEntities(_settings.markets);
@@ -67,8 +72,7 @@ function createCoinsEntities(markets) {
         var coin = world.entity().set('pairValue', {
             mainCoin: 'ETH',
             baseCoin: 'BTC',
-            value: null,
-            state: 'init'
-        }).set(markets[idx].marketName);
+            value: null
+        }).set('updatingState').set(markets[idx].marketName);
     }
 }

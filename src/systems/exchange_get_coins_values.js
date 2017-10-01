@@ -12,36 +12,45 @@ class ExchangeGetCoinsValuesSystem {
     
     every(exchange) {
         let opts = this.opts
-                opts.url = exchange.lastPriceUrl
-                let world = this.world
+        opts.url = exchange.lastPriceUrl
+        let world = this.world
 
-                this.request(opts, function (error, response, body) {
+        // changes state of (pairValues, exchange.name) entities to 'loading'
+        let pairs = world.every(['pairValue', exchange.name])
+        for (let pair of pairs) {
+            pair.remove('readyState')
+            pair.set('updatingState')
+        }
+        console.log('loading',exchange.name)        
         
-                    if (error) console.log(error)
-
-                    try {
-                        let data = JSON.parse(body);
-                        let newCoinPrices = exchange.getLastPrice(data, {});
-
-                        // TODO: extract the following code into a new "talking" method
-                        let receivedCoins = Object.keys(newCoinPrices)
-                        for (let mainCoin in receivedCoins) {
-
-                            let coin = receivedCoins[mainCoin]
-                            let pairs = world.every(['pairValue', exchange.name])
-
-                            for (let pair of pairs) {
-                                let p = pair.access('pairValue')
-                                p.value = newCoinPrices[coin][exchange.name]
-                                p.state = 'ready'
-                            }
-                        }    
-        
-                    } catch (error) {
-                        // TODO: manage the "loss of communication" error updating coins entities 
-                        console.error(error);
+        // send request for this exchange in order to get coin values
+        this.request(opts, function (error, response, body) {
+            
+            if (error) console.log(error)
+            
+            try {
+                // converts data from exchange to a common format
+                let newCoinPrices = exchange.getLastPrice(JSON.parse(body), {});
+                
+                // TODO: extract the following code into a new "talking" method
+                let receivedCoins = Object.keys(newCoinPrices)
+                for (let mainCoin in receivedCoins) {
+                    let coin = receivedCoins[mainCoin]
+                    let pairs = world.every(['pairValue', exchange.name])
+                    
+                    for (let pair of pairs) {
+                        console.log('ready',exchange.name)        
+                        pair.access('pairValue').value = newCoinPrices[coin][exchange.name]
+                        pair.remove('updatingState')
+                        pair.set('readyState')
                     }
-                });
+                }    
+
+            } catch (error) {
+                // TODO: manage the "loss of communication" error updating coins entities 
+                console.error(error);
+            }
+        });
         
         
 
