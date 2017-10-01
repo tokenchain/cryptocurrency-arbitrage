@@ -1,4 +1,4 @@
-class ExchangeGetDataSystem {
+class ExchangeGetCoinsValuesSystem {
 	initialize(world, request) {
         this.world = world
 		this.request = request
@@ -49,4 +49,4 @@ class ExchangeGetDataSystem {
     }
 }
 
-exports.ExchangeGetDataSystem = ExchangeGetDataSystem
+exports.ExchangeGetCoinsValuesSystem = ExchangeGetCoinsValuesSystem

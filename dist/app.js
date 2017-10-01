@@ -18,15 +18,13 @@ var _updating = require('../src/components/updating');
 
 var _pair_value = require('../src/components/pair_value');
 
-var _exchange_get_data = require('../src/systems/exchange_get_data');
+var _exchange_get_coins_values = require('../src/systems/exchange_get_coins_values');
 
 var _show_coins_values = require('../src/systems/show_coins_values');
 
 var _settings = require('../src/config/settings');
 
-function _interopRequireDefault(obj) {
-    return obj && obj.__esModule ? obj : { default: obj };
-}
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var world = new _picoes.World();
 
@@ -34,7 +32,7 @@ world.component('exchange', _exchange.ExchangeComponent);
 world.component('pairValue', _pair_value.PairValueComponent);
 // world.component('updateCoinCommand', DoUpdateCoinValueCommand )
 
-world.system(['exchange'], _exchange_get_data.ExchangeGetDataSystem);
+world.system(['exchange'], _exchange_get_coins_values.ExchangeGetCoinsValuesSystem);
 world.system(['pairValue'], _show_coins_values.ShowCoinsValuesSystem);
 
 createExchangesEntities(_settings.markets);

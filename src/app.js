@@ -12,7 +12,7 @@ import {ExchangeComponent} from '../src/components/exchange'
 import {UpdatingComponent} from '../src/components/updating'
 import {PairValueComponent} from '../src/components/pair_value'
 
-import {ExchangeGetDataSystem} from '../src/systems/exchange_get_data'
+import {ExchangeGetCoinsValuesSystem} from '../src/systems/exchange_get_coins_values'
 import {ShowCoinsValuesSystem} from '../src/systems/show_coins_values'
 
 import {markets} from '../src/config/settings'
@@ -25,7 +25,7 @@ world.component('exchange', ExchangeComponent )
 world.component('pairValue', PairValueComponent )
 // world.component('updateCoinCommand', DoUpdateCoinValueCommand )
 
-world.system(['exchange'], ExchangeGetDataSystem)
+world.system(['exchange'], ExchangeGetCoinsValuesSystem)
 world.system(['pairValue'], ShowCoinsValuesSystem)
 
 createExchangesEntities(markets)
