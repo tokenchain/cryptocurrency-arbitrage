@@ -11,8 +11,6 @@ class ExchangeGetCoinsValuesSystem {
     }
     
     every(exchange) {
-        // console.log('world',this.world)
-        // let pricePromise = exchange.getLastPrice('ETH', 'BTC')
         let opts = this.opts
                 opts.url = exchange.lastPriceUrl
                 let world = this.world
@@ -25,6 +23,7 @@ class ExchangeGetCoinsValuesSystem {
                         let data = JSON.parse(body);
                         let newCoinPrices = exchange.getLastPrice(data, {});
 
+                        // TODO: extract the following code into a new "talking" method
                         let receivedCoins = Object.keys(newCoinPrices)
                         for (let mainCoin in receivedCoins) {
 
@@ -32,13 +31,14 @@ class ExchangeGetCoinsValuesSystem {
                             let pairs = world.every(['pairValue', exchange.name])
 
                             for (let pair of pairs) {
-                                pair.access('pairValue').value = newCoinPrices[coin][exchange.name]
+                                let p = pair.access('pairValue')
+                                p.value = newCoinPrices[coin][exchange.name]
+                                p.state = 'ready'
                             }
                         }    
-                        // console.log('newCoinPrices',newCoinPrices);        
         
                     } catch (error) {
-                        //log.info("Error getting JSON response from", options.URL, error); //Throws error
+                        // TODO: manage the "loss of communication" error updating coins entities 
                         console.error(error);
                     }
                 });

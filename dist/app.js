@@ -45,6 +45,7 @@ setInterval(function () {
     world.run();
 }, 1000);
 
+// TODO: move this into initialize method of a new system
 function createExchangesEntities(markets) {
     // console.log('markets',markets)
     for (var idx in markets) {
@@ -59,13 +60,15 @@ function createExchangesEntities(markets) {
     }
 }
 
+// TODO: move this into initialize method of a new system
 function createCoinsEntities(markets) {
     // console.log('markets',markets)
     for (var idx in markets) {
         var coin = world.entity().set('pairValue', {
             mainCoin: 'ETH',
             baseCoin: 'BTC',
-            value: null
+            value: null,
+            state: 'init'
         }).set(markets[idx].marketName);
     }
 }

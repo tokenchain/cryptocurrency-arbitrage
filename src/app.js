@@ -40,6 +40,7 @@ setInterval(function() {
 }, 1000)
 
 
+// TODO: move this into initialize method of a new system
 function createExchangesEntities(markets)
 {
     // console.log('markets',markets)
@@ -58,6 +59,7 @@ function createExchangesEntities(markets)
 }
 
 
+// TODO: move this into initialize method of a new system
 function createCoinsEntities(markets)
 {
     // console.log('markets',markets)
@@ -66,7 +68,8 @@ function createCoinsEntities(markets)
             .set('pairValue', {
                 mainCoin: 'ETH',
                 baseCoin: 'BTC',
-                value: null
+                value: null,
+                state: 'init' 
             })
             .set(markets[idx].marketName)
     }
