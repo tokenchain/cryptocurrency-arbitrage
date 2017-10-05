@@ -21,7 +21,7 @@ class ExchangeGetCoinsValuesSystem {
             pair.remove('readyState')
             pair.set('updatingState')
         }
-        console.log('loading',exchange.name)        
+        // console.log('loading',exchange.name)        
         
         // send request for this exchange in order to get coin values
         this.request(opts, function (error, response, body) {
@@ -39,7 +39,7 @@ class ExchangeGetCoinsValuesSystem {
                     let pairs = world.every(['pairValue', exchange.name])
                     
                     for (let pair of pairs) {
-                        console.log('ready',exchange.name)        
+                        // console.log('ready',exchange.name)        
                         pair.access('pairValue').value = newCoinPrices[coin][exchange.name]
                         pair.access('pairValue').exchange = exchange.name
                         pair.remove('updatingState')

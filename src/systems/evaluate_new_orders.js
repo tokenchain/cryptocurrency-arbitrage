@@ -7,45 +7,58 @@ class EvaluateNewOrdersSystem
         this.threshold = 0.1
         this.orderAmount = 123
     }
-    
-    every(pair) 
-    {
-        // console.log('show', this.world.index.query(this.components))
-        // console.log(pair)
-    }
 
-    createNewOrders(coin, data, threshold)
+    createNewOrders(coin, exchangesValues, threshold)
     {
-        let oldOrders = this.world.get('order')
+        let oldOrdersIds = this.getOldOrdersIds()
 
         let ordersCount = 0
-        let movement = {}
-        let lastIdx = data.length - 1
+        let lastIdx = exchangesValues.length - 1
 
-        // the first with the last, the second with the second-last
-        for (let long = 0; long < data.length/2; long++) {
+        // the first with the last, the second with the second-last, etc...
+        for (let long = 0; long < exchangesValues.length/2; long++) {
             let short = lastIdx - long
-            let profit = (data[short][0] / data[long][0] - 1) * 100;
+            let longFrom = exchangesValues[long][1]
+            let shortFrom = exchangesValues[short][1]
+            
+            let id = this.createOrderId(coin, longFrom, shortFrom)
+            if (oldOrdersIds.indexOf(id) >= 0) {
+                continue;
+            }
 
+            let profit = (exchangesValues[short][0] / exchangesValues[long][0] - 1) * 100;
             if (profit <= threshold) {
                 continue;
             }
 
             this.world.entity()
                 .set('order', {
+                    id: id,
                     currency: coin,
                     amount: this.orderAmount,
-                    longAt: data[long][0],
-                    longFrom: data[long][1],
-                    shortAt:  data[short][0],
-                    shortFrom:  data[short][1],
+                    longAt: exchangesValues[long][0],
+                    longFrom: longFrom,
+                    shortAt:  exchangesValues[short][0],
+                    shortFrom:  shortFrom,
                     profitForecastPerc: profit.toFixed(2)+'%',
-                    time: '2017-10-03 23:25'
+                    time: new Date().getTime()
                 })
 
-            ordersCount++;
+            ordersCount += 1
         }
         return ordersCount
+    }
+
+    getOldOrdersIds()
+    {
+        let oldOrders = this.world.get('order')
+        return oldOrders.map(function(o) { return o.data.order.id; })
+    }
+
+
+    createOrderId(coin, shortFrom, longFrom)
+    {
+        return coin + '-L_' + longFrom + '-S_' + shortFrom
     }
 
     sortPairs(pairs)

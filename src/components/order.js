@@ -1,7 +1,7 @@
 class OrderComponent 
 {
     constructor(data) {
-        this.id = data.currency + '-L_' + data.longFrom + '-S_' + data.shortFrom;
+        this.id = data.id
         this.currency = data.currency;
         this.longAt = data.longAt;
         this.longFrom = data.longFrom;
