@@ -4,19 +4,23 @@
 
 'use strict';
 
+import {markets} from '../src/config/settings'
+
 import {World} from 'picoes'
 import {Promise} from 'bluebird'
 import request from 'request'
 
 import {ExchangeComponent} from '../src/components/exchange'
 import {PairValueComponent} from '../src/components/pair_value'
+import {OrderComponent} from '../src/components/order'
 import {UpdatingStateComponent} from '../src/components/updating_state'
 import {ReadyStateComponent} from '../src/components/ready_state'
 
 import {ExchangeGetCoinsValuesSystem} from '../src/systems/exchange_get_coins_values'
+import {EvaluateNewOrdersSystem} from '../src/systems/evaluate_new_orders'
 import {ShowCoinsValuesSystem} from '../src/systems/show_coins_values'
+import {OpenOrdersSystem} from '../src/systems/open_orders'
 
-import {markets} from '../src/config/settings'
 
 
 
@@ -24,10 +28,13 @@ let world = new World()
 
 world.component('exchange', ExchangeComponent )
 world.component('pairValue', PairValueComponent )
+world.component('order', OrderComponent )
 world.component('readyState', ReadyStateComponent )
 world.component('updatingState', UpdatingStateComponent )
 
 world.system(['pairValue','readyState'], ShowCoinsValuesSystem)
+world.system(['pairValue','readyState'], EvaluateNewOrdersSystem)
+world.system(['order'], OpenOrdersSystem)
 world.system(['exchange'], ExchangeGetCoinsValuesSystem)
 
 createExchangesEntities(markets)
@@ -70,7 +77,8 @@ function createCoinsEntities(markets)
             .set('pairValue', {
                 mainCoin: 'ETH',
                 baseCoin: 'BTC',
-                value: null
+                value: null,
+                exchange: null
             })
             .set('updatingState')
             .set(markets[idx].marketName)

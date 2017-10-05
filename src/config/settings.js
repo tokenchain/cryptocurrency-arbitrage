@@ -33,7 +33,7 @@ let markets = [
 //    require('../exchanges/bitfinex'),
 //    require('../exchanges/therocktrading'),
 //    require('../exchanges/cexio'),
-//    require('../exchanges/gdax'),
+    // require('../exchanges/gdax'),
     // funzionante ma poche transazioni require('../exchanges/gatecoin'),
 //    require('../exchanges/hitbtc'),
     // funzionante ma poche transazioni require('../exchanges/quoine'),

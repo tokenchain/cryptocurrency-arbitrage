@@ -41,6 +41,7 @@ class ExchangeGetCoinsValuesSystem {
                     for (let pair of pairs) {
                         console.log('ready',exchange.name)        
                         pair.access('pairValue').value = newCoinPrices[coin][exchange.name]
+                        pair.access('pairValue').exchange = exchange.name
                         pair.remove('updatingState')
                         pair.set('readyState')
                     }

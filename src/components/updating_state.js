@@ -1,4 +1,5 @@
-class UpdatingComponent {
+class UpdatingComponent 
+{
     constructor() {
     }
 }
