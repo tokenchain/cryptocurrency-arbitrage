@@ -4,7 +4,7 @@ class EvaluateNewOrdersSystem
     {
         this.world = world
         this.prices = []
-        this.threshold = 0.1
+        this.threshold = 0.59
         this.orderAmount = 123
     }
 
@@ -43,15 +43,19 @@ class EvaluateNewOrdersSystem
                     profitForecastPerc: profit.toFixed(2)+'%',
                     time: new Date().getTime()
                 })
+                .set('newOrder')
 
             ordersCount += 1
         }
+
         return ordersCount
     }
+
 
     getOldOrdersIds()
     {
         let oldOrders = this.world.get('order')
+
         return oldOrders.map(function(o) { return o.data.order.id; })
     }
 
@@ -61,19 +65,22 @@ class EvaluateNewOrdersSystem
         return coin + '-L_' + longFrom + '-S_' + shortFrom
     }
 
+
     sortPairs(pairs)
     {
         let sorted = [];
         for (let idx in pairs) {
             let pairValue = pairs[idx].get('pairValue')
-            sorted.push([pairValue.value, pairValue.exchange]);
+            sorted.push([pairValue.value, pairValue.exchange.name]);
         }
 
         sorted.sort(function (a, b) {
             return a[0] - b[0];
         });
+
         return sorted
     }
+
 
     post()
     {
@@ -87,7 +94,9 @@ class EvaluateNewOrdersSystem
 
         ordersCount = this.createNewOrders(coin, pairs, this.threshold)
 
-        console.log(ordersCount+' orders')
+        if (ordersCount) {
+            console.log(ordersCount+' new orders')
+        }
     }
 }
 

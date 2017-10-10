@@ -1,5 +1,7 @@
-class ExchangeGetCoinsValuesSystem {
-	initialize(world, request) {
+class ExchangeGetCoinsValuesSystem 
+{
+    initialize(world, request) 
+    {
         this.world = world
 		this.request = request
         this.opts = {
@@ -10,7 +12,8 @@ class ExchangeGetCoinsValuesSystem {
         }
     }
     
-    every(exchange) {
+    every(exchange) 
+    {
         let opts = this.opts
         opts.url = exchange.lastPriceUrl
         let world = this.world
@@ -41,7 +44,7 @@ class ExchangeGetCoinsValuesSystem {
                     for (let pair of pairs) {
                         // console.log('ready',exchange.name)        
                         pair.access('pairValue').value = newCoinPrices[coin][exchange.name]
-                        pair.access('pairValue').exchange = exchange.name
+                        pair.access('pairValue').exchange = exchange
                         pair.remove('updatingState')
                         pair.set('readyState')
                     }
@@ -49,7 +52,7 @@ class ExchangeGetCoinsValuesSystem {
 
             } catch (error) {
                 // TODO: manage the "loss of communication" error updating coins entities 
-                console.error(error);
+                console.error({'[ERROR] EXCHANGE in exchange_get_coins_values': exchange.name}, error);
             }
         });
         
