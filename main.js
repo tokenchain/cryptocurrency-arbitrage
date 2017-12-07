@@ -1,5 +1,4 @@
 /**
- * Created by Manu Masson on 6/27/2017.
  *
  */
 
