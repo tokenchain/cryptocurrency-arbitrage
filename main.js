@@ -3,33 +3,26 @@
  */
 
 'use strict';
-
 console.log('Starting app...');
-
 const request = require('request'), Promise = require("bluebird"); //request for pulling JSON from api. Bluebird for Promises.
 const express = require('express');
-const app = express(), 
-    helmet = require('helmet'), 
-    http = require('http').Server(app), 
+const app = express(),
+    helmet = require('helmet'),
+    http = require('http').Server(app),
     io = require('socket.io')(http); // For websocket server functionality
 
 app.use(express.static('./frontend'));
 app.use(helmet.hidePoweredBy({setTo: 'PHP/5.4.0'}));
 // app.use(cors({credentials: false}));
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3044;
 
 app.get('/', function (req, res) {
     res.sendFile(__dirname + '/index.html');
 });
-
-
 http.listen(port, function () {
     console.log('listening on', port);
 });
-
-
 require('./settings.js')(); //Includes settings file.
-
 let coinNames = [];
 io.on('connection', function (socket) {
     socket.emit('coinsAndMarkets', [marketNames, coinNames]);
@@ -91,17 +84,17 @@ function computePrices(data) {
                     for (let j = i + 1; j < arr.length; j++) {
                         results.push(
                             [
-                                coin, 
-                                arr[i][0] / arr[j][0], 
-                                arr[i][0], arr[j][0], 
-                                arr[i][1], arr[j][1] 
-                            ], 
+                                coin,
+                                arr[i][0] / arr[j][0],
+                                arr[i][0], arr[j][0],
+                                arr[i][1], arr[j][1]
+                            ],
                             [
-                                coin, 
-                                arr[j][0] / arr[i][0], 
-                                arr[j][0], 
-                                arr[i][0], 
-                                arr[j][1], 
+                                coin,
+                                arr[j][0] / arr[i][0],
+                                arr[j][0],
+                                arr[i][0],
+                                arr[j][1],
                                 arr[i][1]
                             ]
                         );
