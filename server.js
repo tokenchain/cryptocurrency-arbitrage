@@ -13,41 +13,53 @@ const koahelmet = require('koa-helmet');
 const IO = require('koa-socket.io');
 const settings = require('./settings');
 const app = new Koa();
-const server = http.createServer(app.callback());
-let options = {
-    /* socket.io options */
-};
-const io = new IO({
+const io_server = http.createServer(app.callback());
+let options = {};
+const io7server = new IO({
     namespace: '/'
 });
-//const io = require('socket.io')(server);
+
 app.use(staticServe('./frontend'));
-const port = process.env.PORT || 8001;
+const port = process.env.PORT || 8002;
 const host = 'localhost';
 app.use(koahelmet());
-//app.listen(port, function () {
-//    console.log('Trading Machine is now ONLINE. listening on', port);
-//});
-io.start(server, options);
-server.listen(port, host, function () {
+/*
+ io7server.use(function*(next) {
+ let start = new Date();
+ yield next;
+ console.log(`response time: ${ new Date() - start }ms`)
+ });*/
+
+io7server.start(io_server, options);
+io_server.listen(port, host, function () {
     console.log('Trading Machine is now ONLINE. listening on', port);
-    debug('server listen on: http://' + host + ':' + port);
+    //  debug('server listen on: http://' + host + ':' + port);
 });
+
+io7server.on('error', function (error) {
+    console.log(error);
+});
+
+
 // coin_prices is an object with data on price differences between markets. = {BTC : {market1 : 2000, market2: 4000, p : 2}, } (P for percentage difference)
 // results is a 2D array with coin name and percentage difference, sorted from low to high.
-let coinNames = [], coin_prices = {}, numberOfRequests = 0, results = []; // GLOBAL variables to get pushed to browser.
-io.on('connect', async (ctx) => {
+let coinNames = [], coin_prices = {}, numberOfRequests = 0, results = [], global_socket; // GLOBAL variables to get pushed to browser.
+const list_ex = settings.exchanges().map(ex => ex.id);
+io7server.on('connect', async (ctx) => {
     const socket = ctx.socket;
-    //   let coinNamesList = [];
-    let arr_list = settings.exchanges().map(ex => ex.id);
-    socket.emit('coinsAndMarkets', [arr_list, coinNames]);
+    global_socket = socket;
+    console.log('someone connect: %s', ctx.id);
+    socket.emit('coinsAndMarkets', [list_ex, coinNames]);
     socket.emit('results', results);
-    socket.on("disconnect", () => console.log("Client disconnected"));
+    socket.on('disconnect', () => console.log("===> disconnected"));
+    socket.on('reconnect_client', () => {
+        console.log("===> back online server");
+    });
 });
-async function getMarketData(exchange_obj, coin_prices) { //GET JSON DATA
+
+
+async function getMarketData(exchange_obj, coin_prices) {
     await exchange_obj.loadMarkets();
-    //console.log(numberOfRequests);
-    //console.log("for loop", exchange_obj);
     for (let tradingPair in exchange_obj.markets) {
         if (!tradingPair.includes("BTC"))continue;
         //console.log("for loop", coinName);
@@ -68,7 +80,7 @@ function computePrices(data) {
         results = [];
         for (let coin in data) {
             if (Object.keys(data[coin]).length > 1) {
-                if (coinNames.includes(coin) == false) coinNames.push(coin);
+                if (coinNames.includes(coin) === false) coinNames.push(coin);
                 let arr = [];
                 for (let market in data[coin]) {
                     arr.push([data[coin][market], market]);
@@ -102,18 +114,20 @@ function computePrices(data) {
         results.sort(function (a, b) {
             return a[1] - b[1];
         });
-        // console.log(results);
-        io.emit('results', results);
+        //console.log('return data market --> reuslts emits');
+        if (global_socket != undefined) {
+            global_socket.emit('results', results);
+        }
     }
 }
 
 (async function main() {
     let arrayOfRequests = [];
     for (let ex of settings.exchanges()) {
-        console.log("market", ex.id);
         arrayOfRequests.push(getMarketData(ex, coin_prices));
     }
-    console.log("=========");
+    console.log("=========> new", numberOfRequests);
     arrayOfRequests.map(e => e.catch(e => e));
     setTimeout(main, 10000);
 })();
+

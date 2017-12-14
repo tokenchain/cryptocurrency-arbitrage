@@ -11,6 +11,7 @@ const checkedMarkets = {
     },
     checkedCoins = {
         showAll: false,
+        BTC: true,
         TIC: false,
         PLC: false
     };
@@ -93,19 +94,18 @@ function searchMarketsOrCoins(marketOrCoin, input) {
 }
 
 let useData;
-
-$(window).load(function () {
+$(function () {
     new WOW().init();
     $('.loader').hide();
     $('#header').show();
-    let socket = io('//localhost:8001');
+    let socket = io('//localhost:8002');
+    //let socket = io();
+
     let numberOfLoads = 0; //Number of final results loads
     let numberOfMLoads = 0; //Number of Market loadss
-
     socket.on('coinsAndMarkets', function (index_data) { //Function for when we get market data
-        console.log("started here");
-        console.log(index_data);
-        console.log("started here");
+
+        console.log('show market indexs', index_data);
         if (numberOfMLoads === 0) {  //Only  need to run this function once (Currently)
             let list = $('#market-list').empty(), coinList = $('#coin-list').empty();
             let marketSource = $("#market-list-template").html(); //Source
@@ -179,7 +179,6 @@ $(window).load(function () {
         let initN = 1;
         let dataLen = data.length;
         highest.empty();  //Remove any previous data (LI) from UL
-        console.log(checkedCoins);
         for (let i = dataLen - initN; i >= dataLen - topN; i--) { //Loop through top 10
             let highMarket = data[i][4], lowMarket = data[i][5], pairIndex, coinName = data[i][0];
             //console.log(checkedCoins[coinName]);
@@ -237,23 +236,41 @@ $(window).load(function () {
     }
 
     let waitForMoreData;
-
+    console.log("loaded socket");
+    socket.on('disconnect', function () {
+        console.log('you have been disconnected');
+    });
+    socket.on('reconnect', function () {
+        console.log('you have been reconnected');
+        // socket.emit('reconnect_client', "");
+    });
+    socket.on('reconnect_error', function () {
+        console.log('attempt to reconnect has failed');
+    });
     socket.on('results', function (results) {
-        clearTimeout(waitForMoreData); //Every time we recieive new data clear the previous timeout so we don't loop through the data too many times unnecessarily...
+        // console.log("receive result from server:: ", numberOfLoads);
+        // clearTimeout(waitForMoreData);
         numberOfLoads++;
         if (numberOfLoads === 1) { //...unless we haven't loaded the data yet, then just run useData() immediately.
+            // console.log("show data for updates..");
             $('.socket-loader').hide(); // Hide the preloader.gif
             $('#highest, #lowest').show(); //Show The UL
             data = results;
             useData();
         } else {
-            waitForMoreData = setTimeout(function () {
-                data = results;
-                useData();
-            }, 1000); //Wait a second before we run the function in case we get newer data within less than a second
-        }
 
+            //  data = results;
+            //          useData();
+            if (waitForMoreData === 0) {
+                waitForMoreData = setTimeout(function () {
+                    data = results;
+                    useData();
+                    clearTimeout(waitForMoreData);
+                }, 1000);
+            }
+        }
     });
+
     // console.log("started here", socket);
 });
 
