@@ -11,7 +11,7 @@ const Koa = require('koa');
 const http = require('http');
 const koahelmet = require('koa-helmet');
 const IO = require('koa-socket.io');
-const settings = require('./settingscx');
+const settings = require('./settings');
 const app = new Koa();
 const server = http.createServer(app.callback());
 let options = {
@@ -38,10 +38,9 @@ server.listen(port, host, function () {
 let coinNames = [], coin_prices = {}, numberOfRequests = 0, results = []; // GLOBAL variables to get pushed to browser.
 io.on('connect', async (ctx) => {
     const socket = ctx.socket;
+    //   let coinNamesList = [];
     let arr_list = settings.exchanges().map(ex => ex.id);
-    //console.log(arr_list);
-    let coinNamesList = coinNames.map(l => l.split("/")[0]);
-    socket.emit('coinsAndMarkets', [arr_list, coinNamesList]);
+    socket.emit('coinsAndMarkets', [arr_list, coinNames]);
     socket.emit('results', results);
     socket.on("disconnect", () => console.log("Client disconnected"));
 });
@@ -49,9 +48,13 @@ async function getMarketData(exchange_obj, coin_prices) { //GET JSON DATA
     await exchange_obj.loadMarkets();
     //console.log(numberOfRequests);
     //console.log("for loop", exchange_obj);
-    for (let coinName in exchange_obj.markets) {
+    for (let tradingPair in exchange_obj.markets) {
+        if (!tradingPair.includes("BTC"))continue;
         //console.log("for loop", coinName);
-        let ticker = await exchange_obj.fetchTicker(coinName);
+        let ticker = await exchange_obj.fetchTicker(tradingPair);
+        // console.log("show coin name", coinNamePair);
+        const pair = tradingPair.split("/");
+        const coinName = pair[0] === 'BTC' ? pair[1] : pair[0];
         if (!coin_prices[coinName]) coin_prices[coinName] = {};
         coin_prices[coinName][exchange_obj.id] = ticker['last'];
         //console.log("for_loop", exchange_obj.id);
@@ -65,7 +68,6 @@ function computePrices(data) {
         results = [];
         for (let coin in data) {
             if (Object.keys(data[coin]).length > 1) {
-                //console.log(coin);
                 if (coinNames.includes(coin) == false) coinNames.push(coin);
                 let arr = [];
                 for (let market in data[coin]) {

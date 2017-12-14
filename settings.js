@@ -1,46 +1,52 @@
-//
-// let boilerPlateMarket =
-// {
-//     marketName: '',
-//     URL: '', //URL To Fetch API From.
-//     toBTCURL: false, //URL, if needed for an external bitcoin price api.
-//     last: function (data, coin_prices) { //Get the last price of coins in JSON data
-//         return new Promise(function (res, rej) {
-//             try {
-//                 for (x in / of data) {
-//                     price = ...;
-//                     coin_prices[coinName][marketName] = price;
-//                 }
-//                 res(coin_prices);
-//             }
-//             catch (err) {
-//                 rej(err);
-//             }
-//
-//         })
-//     },
-//
-//
-// }
+/**
+ * Created by hesk on 2017/12/13.
+ */
+/*
+ import ccxt from 'ccxt'
 
-let markets = [
-    require('./exchanges/bittrex'),
-    // require('./exchanges/btc38'),
-    //    require('./exchanges/jubi'),
-    require('./exchanges/poloniex'),
-    require('./exchanges/cryptopia'),
-    require('./exchanges/bleutrade'),
-    require('./exchanges/kraken'),
-    require('./exchanges/bitfinex'),
-    require('./exchanges/therocktrading'),
-];
+ export default class {
+ exchanges() {
+ return [
+ new ccxt.kraken({verbose: true}),
+ new ccxt.bittrex({verbose: true}),
+ new ccxt.btc38({verbose: true}),
+ new ccxt.jubi({verbose: true}),
+ new ccxt.poloniex({verbose: true}),
+ new ccxt.cryptopia({verbose: true}),
+ new ccxt.anxpro({verbose: true}),
+ new ccxt.bithumb({verbose: true}),
+ new ccxt.bitflyer({verbose: true}),
+ new ccxt.tidex({verbose: true}),
+ new ccxt.bitmex({verbose: true}),
+ new ccxt.bitstamp({verbose: true}),
+ new ccxt.cex({verbose: true}),
+ new ccxt.exmo({verbose: true}),
+ new ccxt.bitfinex2({verbose: true})
+ ];
+ }
+ }
+ */
 
-let marketNames = [];
-for(let i = 0; i < markets.length; i++) { // Loop except cryptowatch
-    marketNames.push([[markets[i].marketName], [markets[i].pairURL]]);
+const ccxt = require('ccxt');
+module.exports = {
+    exchanges: function () {
+        return [
+            new ccxt.kraken({verbose: false}),
+            new ccxt.bittrex({verbose: false}),
+            new ccxt.jubi({verbose: false}),
+            new ccxt.poloniex({verbose: false}),
+            new ccxt.cryptopia({verbose: false}),
+            new ccxt.anxpro({verbose: false}),
+            new ccxt.bithumb({verbose: false}),
+            new ccxt.bitflyer({verbose: false}),
+            new ccxt.tidex({verbose: false}),
+            new ccxt.bitmex({verbose: false}),
+            new ccxt.bitstamp({verbose: false}),
+            new ccxt.cex({verbose: false}),
+            new ccxt.exmo({verbose: false}),
+            new ccxt.bitfinex2({verbose: false})
+        ];
+
+    }
 }
-console.log("Markets:", marketNames);
-module.exports = function () {
-    this.markets = markets;
-    this.marketNames = marketNames;
-};
+;
