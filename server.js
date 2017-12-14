@@ -1,8 +1,6 @@
 /**
  * Created by hesk on 2017/12/13.
  */
-
-
 'use strict';
 console.log('Starting app...');
 const debug = require('debug')('koa-socket.io:example');
@@ -18,29 +16,18 @@ let options = {};
 const io7server = new IO({
     namespace: '/'
 });
-
 app.use(staticServe('./frontend'));
 const port = process.env.PORT || 8002;
 const host = 'localhost';
 app.use(koahelmet());
-/*
- io7server.use(function*(next) {
- let start = new Date();
- yield next;
- console.log(`response time: ${ new Date() - start }ms`)
- });*/
-
 io7server.start(io_server, options);
 io_server.listen(port, host, function () {
     console.log('Trading Machine is now ONLINE. listening on', port);
     //  debug('server listen on: http://' + host + ':' + port);
 });
-
 io7server.on('error', function (error) {
     console.log(error);
 });
-
-
 // coin_prices is an object with data on price differences between markets. = {BTC : {market1 : 2000, market2: 4000, p : 2}, } (P for percentage difference)
 // results is a 2D array with coin name and percentage difference, sorted from low to high.
 let coinNames = [], coin_prices = {}, numberOfRequests = 0, results = [], global_socket; // GLOBAL variables to get pushed to browser.
@@ -56,8 +43,6 @@ io7server.on('connect', async (ctx) => {
         console.log("===> back online server");
     });
 });
-
-
 async function getMarketData(exchange_obj, coin_prices) {
     await exchange_obj.loadMarkets();
     for (let tradingPair in exchange_obj.markets) {
@@ -126,7 +111,7 @@ function computePrices(data) {
     for (let ex of settings.exchanges()) {
         arrayOfRequests.push(getMarketData(ex, coin_prices));
     }
-    console.log("=========> new", numberOfRequests);
+    console.log("======> new ===>", numberOfRequests);
     arrayOfRequests.map(e => e.catch(e => e));
     setTimeout(main, 10000);
 })();
