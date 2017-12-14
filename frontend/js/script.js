@@ -3,14 +3,11 @@
 function history(coin1, coin2) {
     alert('History graphs coming soon', coin1, coin2);
 }
-
 // alert("Under mantainence, come back in an hour.");
-
-var checkedMarkets = {
+const checkedMarkets = {
         showAll: true,
         bittrex: true,
         poloniex: true
-
     },
     checkedCoins = {
         showAll: false,
@@ -19,67 +16,56 @@ var checkedMarkets = {
     };
 
 let addOne = true;
-
 function addRemoveAll(coinsOrMarkets) {
-
     if (coinsOrMarkets === 'markets') {
-
         for (let market in checkedMarkets) {
             checkedMarkets[market] = !checkedMarkets.showAll;
             console.log(checkedMarkets[market]);
             addOne = false;
             addRemoveMarket(market);
             addOne = true;
-
         }
         useData();
     }
 
     if (coinsOrMarkets === 'coins') {
-
         for (let coin in checkedCoins) {
             checkedCoins[coin] = !checkedCoins.showAll;
             console.log(checkedCoins[coin]);
             addOne = false;
-            addRemoveCoin(coin)
+            addRemoveCoin(coin);
             addOne = true;
-
         }
         useData();
     }
-
 }
-
 
 function addRemoveCoin(coin) {
     if (addOne) checkedCoins[coin] = !checkedCoins[coin];
-
     if (checkedCoins[coin]) {
         $('#check-' + coin).addClass('fa-check-square-o');
         $('#check-' + coin).removeClass('fa-square-o');
-    }
-    else {
+    } else {
         $('#check-' + coin).removeClass('fa-check-square-o');
         $('#check-' + coin).addClass('fa-square-o');
     }
-
     if (addOne) useData();
 }
 
 function addRemoveMarket(market) {
     console.log("Trying to add/remove market")
-    if (addOne){ console.log("If add one"); checkedMarkets[market] = !checkedMarkets[market] };
-
+    if (addOne) {
+        console.log("If add one");
+        checkedMarkets[market] = !checkedMarkets[market]
+    }
     if (checkedMarkets[market]) {
         console.log("If add one");
         $('#check-' + market).addClass('fa-check-square-o');
         $('#check-' + market).removeClass('fa-square-o');
-    }
-    else {
+    } else {
         $('#check-' + market).removeClass('fa-check-square-o');
         $('#check-' + market).addClass('fa-square-o')
     }
-
     if (addOne) useData();
 }
 
@@ -87,7 +73,7 @@ function remove(item, highOrLow) {
     let li = $(item).closest('li');
     let coin = li.attr("data-coin");
     let market = li.attr("data-market1");
-    if (!Array.isArray(checkedCoins[coin])) checkedCoins[coin]= [];
+    if (!Array.isArray(checkedCoins[coin])) checkedCoins[coin] = [];
     checkedCoins[coin].push(market);
     console.log("Removing item...", checkedCoins[coin]);
     useData();
@@ -96,7 +82,6 @@ function remove(item, highOrLow) {
 function searchMarketsOrCoins(marketOrCoin, input) {
     input = input.toUpperCase();
     let listItems = $('#' + marketOrCoin + '-list > li');
-
     if (input === "") {
         listItems.show();
     } else {
@@ -105,41 +90,34 @@ function searchMarketsOrCoins(marketOrCoin, input) {
             (text.indexOf(input) >= 0) ? $(this).show() : $(this).hide();
         });
     }
-
-
 }
 
 let useData;
 
 $(window).load(function () {
     new WOW().init();
-
     $('.loader').hide();
     $('#header').show();
-
-
-    let socket = io('//localhost:3000/');
-
+    let socket = io('//localhost:8001');
     let numberOfLoads = 0; //Number of final results loads
     let numberOfMLoads = 0; //Number of Market loadss
 
-
-    socket.on('coinsAndMarkets', function (data) { //Function for when we get market data
+    socket.on('coinsAndMarkets', function (index_data) { //Function for when we get market data
+        console.log("started here");
+        console.log(index_data);
+        console.log("started here");
         if (numberOfMLoads === 0) {  //Only  need to run this function once (Currently)
             let list = $('#market-list').empty(), coinList = $('#coin-list').empty();
-
             let marketSource = $("#market-list-template").html(); //Source
             let marketTemplate = Handlebars.compile(marketSource); // ^ and template for coin and market lists
-
             let coinSource = $("#coin-list-template").html(); //Source
             let coinTemplate = Handlebars.compile(coinSource); // ^ and template for coin and market lists
-
-            let coinDataLen = data[1].length;
+            let coinDataLen = index_data[1].length;
             for (let i = 0; i < coinDataLen; i++) { //Loop through coins
-                let context = {coin: data[1][i]};
+                let context = {coin: index_data[1][i]};
                 let coin = context.coin;
-                if (data[0][i]) {
-                    context.market = data[0][i][0];
+                if (index_data[0][i]) {
+                    context.market = index_data[0][i];
                     let market = context.market;
                     list.append(marketTemplate(context));
                     if (checkedMarkets[market] === false || checkedMarkets[market] === undefined) {
@@ -165,10 +143,9 @@ $(window).load(function () {
     let highTemplate = Handlebars.compile(highSource); //Template
 
     let bestSource = $("#best-template").html();
-    let bestTemplate = Handlebars.compile(bestSource);
+    let bestTemplate = Handlebars.compile(bestSource); // handler bars
 
-    var data;
-
+    let data;
     $('#coin-search').keyup(function () {
         let value = $(this).val();
         console.log(value);
@@ -178,24 +155,19 @@ $(window).load(function () {
         let value = $(this).val();
         searchMarketsOrCoins("market", value)
     });
-
     $('.loadNumberInput').change(function () {
         useData();
     });
     function allowedData(lowMarket, highMarket, coinName) {
-        if(checkedMarkets[lowMarket] && checkedMarkets[highMarket] && checkedCoins[coinName]){
-            if(Array.isArray(checkedCoins[coinName])) {
-                if(!checkedCoins[coinName].includes(lowMarket) && !checkedCoins[coinName].includes(highMarket)) {
+        if (checkedMarkets[lowMarket] && checkedMarkets[highMarket] && checkedCoins[coinName]) {
+            if (Array.isArray(checkedCoins[coinName])) {
+                if (!checkedCoins[coinName].includes(lowMarket) && !checkedCoins[coinName].includes(highMarket)) {
                     return true;
-                }
-                else return false;
-
-            }
-            else{
+                } else return false;
+            } else {
                 return true;
             }
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -207,15 +179,15 @@ $(window).load(function () {
         let initN = 1;
         let dataLen = data.length;
         highest.empty();  //Remove any previous data (LI) from UL
+        console.log(checkedCoins);
         for (let i = dataLen - initN; i >= dataLen - topN; i--) { //Loop through top 10
             let highMarket = data[i][4], lowMarket = data[i][5], pairIndex, coinName = data[i][0];
-            console.log(checkedCoins[coinName]);
+            //console.log(checkedCoins[coinName]);
             if (allowedData(lowMarket, highMarket, coinName)) {
                 for (let j = data.length - 1; j >= 0; j--) {
                     if (
                         data[j][4] === highMarket //equal ...
                         && data[j][5] === lowMarket // to opposite market
-
                         && data[i][0] !== data[j][0] //and isnt the same coin as pair
                         && data[j][0] !== 'BTC' //and isnt BTC
                         && checkedCoins[data[j][0]] //and isnt remove
@@ -251,17 +223,13 @@ $(window).load(function () {
                         $('.best-pair').append(bestHTML);
                     }
 
-
                     let html = highTemplate(context);
                     highest.append(html);
-                }
-                else if (data.length - topN > 0) {
+                } else if (data.length - topN > 0) {
                     topN++;
                     highestN++;
                 }
-            }
-
-            else if (data.length - topN > 0) {
+            } else if (data.length - topN > 0) {
                 topN++;
                 highestN++;
             }
@@ -278,9 +246,7 @@ $(window).load(function () {
             $('#highest, #lowest').show(); //Show The UL
             data = results;
             useData();
-        }
-
-        else {
+        } else {
             waitForMoreData = setTimeout(function () {
                 data = results;
                 useData();
@@ -288,7 +254,7 @@ $(window).load(function () {
         }
 
     });
-
+    // console.log("started here", socket);
 });
 
 

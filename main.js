@@ -1,7 +1,3 @@
-/**
- *
- */
-
 'use strict';
 console.log('Starting app...');
 const request = require('request'), Promise = require("bluebird"); //request for pulling JSON from api. Bluebird for Promises.
@@ -35,6 +31,8 @@ let coin_prices = {}, numberOfRequests = 0, results = []; // GLOBAL variables to
 
 function getMarketData(options, coin_prices, callback) { //GET JSON DATA
     return new Promise(function (resolve, reject) {
+
+
         request(options.URL, function (error, response, body) {
             try {
                 let data = JSON.parse(body);
@@ -48,8 +46,7 @@ function getMarketData(options, coin_prices, callback) { //GET JSON DATA
                     if (numberOfRequests >= 1) computePrices(coin_prices);
                     resolve(newCoinPrices);
 
-                }
-                else {
+                } else {
                     resolve(data);
                 }
 
@@ -69,11 +66,10 @@ function computePrices(data) {
         results = [];
         for (let coin in data) {
 
-            if (Object.keys(data[coin]).length > 1){
-                if(coinNames.includes(coin) == false) coinNames.push(coin);
+            if (Object.keys(data[coin]).length > 1) {
+                if (coinNames.includes(coin) == false) coinNames.push(coin);
 
-
-            let arr = [];
+                let arr = [];
                 for (let market in data[coin]) {
                     arr.push([data[coin][market], market]);
                 }
