@@ -7,11 +7,15 @@ function history(coin1, coin2) {
 const checkedMarkets = {
         showAll: true,
         bittrex: true,
-        poloniex: true
+        anxpro: true,
+        ccex: true,
+        gatecoin: true,
+        poloniex: true,
     },
     checkedCoins = {
         showAll: false,
         BTC: true,
+        ETH: true,
         TIC: false,
         PLC: false
     };
