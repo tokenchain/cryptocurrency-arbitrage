@@ -252,26 +252,27 @@ $(function () {
         console.log('attempt to reconnect has failed');
     });
     socket.on('results', function (results) {
+        data = results;
         // console.log("receive result from server:: ", numberOfLoads);
         // clearTimeout(waitForMoreData);
         numberOfLoads++;
         if (numberOfLoads === 1) { //...unless we haven't loaded the data yet, then just run useData() immediately.
-            // console.log("show data for updates..");
+            console.log("show data for updates..");
             $('.socket-loader').hide(); // Hide the preloader.gif
             $('#highest, #lowest').show(); //Show The UL
-            data = results;
             useData();
         } else {
-
             //  data = results;
             //          useData();
-            if (waitForMoreData === 0) {
+           /* if (waitForMoreData === 0) {
                 waitForMoreData = setTimeout(function () {
-                    data = results;
                     useData();
+                    console.log("show data for updates..");
                     clearTimeout(waitForMoreData);
                 }, 1000);
-            }
+            }*/
+
+            useData();
         }
     });
 

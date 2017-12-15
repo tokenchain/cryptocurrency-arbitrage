@@ -22,7 +22,7 @@ const host = 'localhost';
 app.use(koahelmet());
 io7server.start(io_server, options);
 io_server.listen(port, host, function () {
-    console.log('Trading Machine is now ONLINE. listening on', port);
+    console.log('Trading Machine is now ONLINE. Listening on', port);
     //  debug('server listen on: http://' + host + ':' + port);
 });
 io7server.on('error', function (error) {
@@ -31,6 +31,7 @@ io7server.on('error', function (error) {
 // coin_prices is an object with data on price differences between markets. = {BTC : {market1 : 2000, market2: 4000, p : 2}, } (P for percentage difference)
 // results is a 2D array with coin name and percentage difference, sorted from low to high.
 let coinNames = [], coin_prices = {}, numberOfRequests = 0, results = [], global_socket; // GLOBAL variables to get pushed to browser.
+
 const list_ex = settings.exchanges().map(ex => ex.id);
 io7server.on('connect', async (ctx) => {
     const socket = ctx.socket;
@@ -43,6 +44,7 @@ io7server.on('connect', async (ctx) => {
         console.log("===> back online server");
     });
 });
+
 async function getMarketData(exchange_obj, coin_prices) {
     await exchange_obj.loadMarkets();
     for (let tradingPair in exchange_obj.markets) {
@@ -52,14 +54,21 @@ async function getMarketData(exchange_obj, coin_prices) {
         // console.log("show coin name", coinNamePair);
         const pair = tradingPair.split("/");
         const coinName = pair[0] === 'BTC' ? pair[1] : pair[0];
+        const one_over = pair[0] === 'BTC';
         if (!coin_prices[coinName]) coin_prices[coinName] = {};
-        coin_prices[coinName][exchange_obj.id] = ticker['last'];
+        let last = ticker['last'];
+        if (exchange_obj.id === 'gateio') {
+            coin_prices[coinName][exchange_obj.id] = last;
+        } else {
+            coin_prices[coinName][exchange_obj.id] = one_over ? 1 / last : last;
+        }
         //console.log("for_loop", exchange_obj.id);
         //console.log("num_request", numberOfRequests);
         numberOfRequests++;
         if (numberOfRequests >= 1) computePrices(coin_prices);
     }
 }
+
 function computePrices(data) {
     if (numberOfRequests >= 2) {
         results = [];
@@ -93,20 +102,20 @@ function computePrices(data) {
                         );
                     }
                 }
-
             }
         }
         results.sort(function (a, b) {
             return a[1] - b[1];
         });
-        //console.log('return data market --> reuslts emits');
-        if (global_socket != undefined) {
-            global_socket.emit('results', results);
-        }
+
     }
 }
 
 (async function main() {
+    //console.log('return data market-->results emits');
+    if (global_socket != undefined) {
+        global_socket.emit('results', results);
+    }
     let arrayOfRequests = [];
     for (let ex of settings.exchanges()) {
         arrayOfRequests.push(getMarketData(ex, coin_prices));

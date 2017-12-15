@@ -1218,9 +1218,9 @@ caw@^1.0.1:
     object-assign "^3.0.0"
     tunnel-agent "^0.4.0"
 
-ccxt@^1.10.387:
-  version "1.10.387"
-  resolved "https://registry.yarnpkg.com/ccxt/-/ccxt-1.10.387.tgz#31b48353fdc4adc908f951b18f886e807e0b8590"
+ccxt@^1.10.390:
+  version "1.10.390"
+  resolved "https://registry.yarnpkg.com/ccxt/-/ccxt-1.10.390.tgz#29da0506bbcd25cf368985e25e0eaee2753aa4d3"
   dependencies:
     crypto-js "3.1.9-1"
     fetch-ponyfill "^4.1.0"
