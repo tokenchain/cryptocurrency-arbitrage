@@ -53,7 +53,6 @@ while [ opt != '' ]
        2) clear;
           option_picked "Option 1 Picked operation for import translation data to displaymenu";
           ##sh gdtransb.sh;
-
           show_menu;
           ;;
 
@@ -61,11 +60,13 @@ while [ opt != '' ]
           option_picked "Using new ccxt library..";
           yarn add ccxt
           yarn start
+          show_menu;
           ;;
 
        a) clear;
           option_picked "engine run watch js development"
           yarn watch-poll
+          show_menu;
           ;;
 
        x) exit;
