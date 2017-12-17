@@ -10,7 +10,10 @@ const http = require('http');
 const koahelmet = require('koa-helmet');
 const IO = require('koa-socket.io');
 const settings = require('./settings');
+const util = require('./core/util');
 const app = new Koa();
+const opn = require('opn');
+const _ = require('lodash');
 const io_server = http.createServer(app.callback());
 let options = {};
 const io7server = new IO({
@@ -22,8 +25,18 @@ const host = 'localhost';
 app.use(koahelmet());
 io7server.start(io_server, options);
 io_server.listen(port, host, function () {
-    console.log('Trading Machine is now ONLINE. Listening on', port);
+    console.log('Trading Machine is now ONLINE. Listening to the port:: ', port);
+    const location = `http://${host}:${port}`;
     //  debug('server listen on: http://' + host + ':' + port);
+    // only open a browser when running `node gekko`
+    // this prevents opening the browser during development
+    let nodeCommand = _.last(process.argv[1].split('/'));
+    if (nodeCommand === 'server') {
+        try {
+            opn(location);
+        } catch (e) {
+        }
+    }
 });
 io7server.on('error', function (error) {
     console.log(error);
@@ -44,28 +57,35 @@ io7server.on('connect', async (ctx) => {
         console.log("===> back online server");
     });
 });
-
+const bug_fix = ['gateio', 'kucoin'];
 async function getMarketData(exchange_obj, coin_prices) {
     await exchange_obj.loadMarkets();
+    const ex_settlement_symbol = "BTC";
     for (let tradingPair in exchange_obj.markets) {
-        if (!tradingPair.includes("BTC"))continue;
-        //console.log("for loop", coinName);
-        let ticker = await exchange_obj.fetchTicker(tradingPair);
-        // console.log("show coin name", coinNamePair);
         const pair = tradingPair.split("/");
-        const coinName = pair[0] === 'BTC' ? pair[1] : pair[0];
-        const one_over = pair[0] === 'BTC';
-        if (!coin_prices[coinName]) coin_prices[coinName] = {};
-        let last = ticker['last'];
-        if (exchange_obj.id === 'gateio') {
-            coin_prices[coinName][exchange_obj.id] = last;
-        } else {
-            coin_prices[coinName][exchange_obj.id] = one_over ? 1 / last : last;
+        if (pair[0] === ex_settlement_symbol || pair[1] === ex_settlement_symbol) {
+            //console.log("for loop", coinName);
+            let ticker = await exchange_obj.fetchTicker(tradingPair);
+            // console.log("show coin name", coinNamePair);
+            const coinName = pair[0] === ex_settlement_symbol ? pair[1] : pair[0];
+            const one_over = pair[0] === ex_settlement_symbol;
+            if (!coin_prices[coinName]) coin_prices[coinName] = {};
+            let last = ticker['last'];
+            let vol = ticker['baseVolume'];
+            if (vol > 10) {
+                coin_prices[coinName][exchange_obj.id] = one_over ? 1 / last : last;
+                if (exchange_obj.id.indexOf(bug_fix) > -1) {
+                    console.log(tradingPair, last);
+                    coin_prices[coinName][exchange_obj.id] = last;
+                }
+
+
+                //console.log("for_loop", exchange_obj.id);
+                //console.log("num_request", numberOfRequests);
+                numberOfRequests++;
+                if (numberOfRequests >= 1) computePrices(coin_prices);
+            }
         }
-        //console.log("for_loop", exchange_obj.id);
-        //console.log("num_request", numberOfRequests);
-        numberOfRequests++;
-        if (numberOfRequests >= 1) computePrices(coin_prices);
     }
 }
 
@@ -125,3 +145,6 @@ function computePrices(data) {
     setTimeout(main, 10000);
 })();
 
+if (util.launchUI()) {
+
+}

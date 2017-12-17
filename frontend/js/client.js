@@ -11,13 +11,18 @@ const checkedMarkets = {
         ccex: true,
         gatecoin: true,
         poloniex: true,
+        zb: true,
+        bitfinex: true
     },
     checkedCoins = {
-        showAll: false,
-        BTC: true,
+        showAll: true,
+     /*   BTC: true,
         ETH: true,
         TIC: false,
-        PLC: false
+        PLC: false,
+        ADA: true,
+        BTG: true,
+        BTCD: true*/
     };
 
 let addOne = true;
@@ -237,7 +242,7 @@ $(function () {
                 highestN++;
             }
         }
-    }
+    };
 
     let waitForMoreData;
     console.log("loaded socket");
@@ -264,13 +269,13 @@ $(function () {
         } else {
             //  data = results;
             //          useData();
-           /* if (waitForMoreData === 0) {
-                waitForMoreData = setTimeout(function () {
-                    useData();
-                    console.log("show data for updates..");
-                    clearTimeout(waitForMoreData);
-                }, 1000);
-            }*/
+            /* if (waitForMoreData === 0) {
+             waitForMoreData = setTimeout(function () {
+             useData();
+             console.log("show data for updates..");
+             clearTimeout(waitForMoreData);
+             }, 1000);
+             }*/
 
             useData();
         }

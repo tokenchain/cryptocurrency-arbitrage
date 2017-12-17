@@ -9,25 +9,22 @@ const semver = require('semver');
 const program = require('commander');
 const retry = require('retry');
 const startTime = moment();
-const _config = false;
-const _package = false;
-const _nodeVersion = false;
-const _gekkoMode = false;
-const _gekkoEnv = false;
-const _args = false;
+let _config = false;
+let _package = false;
+let _nodeVersion = false;
+let _gekkoMode = false;
+let _gekkoEnv = false;
+let _args = false;
 // helper functions
 const util = {
     getConfig: function () {
         // cache
         if (_config)
             return _config;
-
         if (!program.config)
             util.die('Please specify a config file.', true);
-
         if (!fs.existsSync(util.dirs().gekko + program.config))
             util.die('Cannot find the specified config file.', true);
-
         _config = require(util.dirs().gekko + program.config);
         return _config;
     },
@@ -47,8 +44,6 @@ const util = {
     getPackage: function () {
         if (_package)
             return _package;
-
-
         _package = JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8'));
         return _package;
     },
@@ -68,16 +63,16 @@ const util = {
         return min * 60 * 1000;
     },
     defer: function (fn) {
-        return function (args) {
-            const args = _.toArray(arguments);
+        return function (arguments) {
+            let args = _.toArray(arguments);
             return _.defer(function () {
                 fn.apply(this, args)
             });
         }
     },
     logVersion: function () {
-        return `CXA version: v${util.getVersion()}`
-            + `\nNodejs version: ${process.version}`;
+        return `ARI-B version: v${util.getVersion()}`
+            + `\nNode.js version: ${process.version}`;
     },
     die: function (m, soft) {
         let log;
@@ -90,7 +85,7 @@ const util = {
             if (soft) {
                 log('\n ERROR: ' + m + '\n\n');
             } else {
-                log('\n\nGekko encountered an error and can\'t continue');
+                log('\n\nARI-B encountered an error and can\'t continue');
                 log('\nError:\n');
                 log(m, '\n\n');
                 log('\nMeta debug info:\n');
@@ -120,10 +115,7 @@ const util = {
         }
     },
     inherit: function (dest, source) {
-        require('util').inherits(
-            dest,
-            source
-        );
+        require('util').inherits(dest, source);
     },
     makeEventEmitter: function (dest) {
         util.inherit(dest, require('events').EventEmitter);
@@ -134,7 +126,6 @@ const util = {
     gekkoMode: function () {
         if (_gekkoMode)
             return _gekkoMode;
-
         if (program['import'])
             return 'importer';
         else if (program.backtest)
@@ -177,12 +168,11 @@ const util = {
                 if (operation.retry(err)) {
                     return;
                 }
-
                 callback(err ? operation.mainError() : null, result);
             });
         });
     }
-}
+};
 
 // NOTE: those options are only used
 // in stand alone mode
@@ -198,9 +188,7 @@ program
 if (!util.recentNode())
     util.die([
         'Your local version of Node.js is too old. ',
-        'You have ',
-        process.version,
-        ' and you need atleast ',
+        'You have ', process.version, ' and you need atleast ',
         util.getRequiredNodeVersion()
     ].join(''), true);
 

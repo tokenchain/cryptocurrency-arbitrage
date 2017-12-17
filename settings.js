@@ -2,7 +2,20 @@
  * Created by hesk on 2017/12/13.
  */
 const t = require('ccxt');
+//const select = require('sql-bricks').select;
+let dbprocess = require('pg-bricks').configure(process.env.DATABASE_URL);
+dbprocess = dbprocess.native;
+
 module.exports = {
+    init: async function*() {
+        /**
+         * adding db implementation from using postgre
+         * recording every possible high profit trade for paper mock
+         * recording every high profit trade for real account - only confirm that account has control of it.
+         */
+       // await dbprocess.update('user', {ll: db.sql('now()')}).where('id', id).run();
+        let users = await db.select().from('fx_bank').where({bank_code: name}).rows()
+    },
     exchanges: function () {
         return [
             new t.kraken({verbose: false}),
@@ -63,7 +76,8 @@ module.exports = {
             new t.urdubit({verbose: false}),
             new t.vaultoro({verbose: false}),
             new t.therock({verbose: false}),
-            new t.bitfinex2({verbose: false})
+            new t.bitfinex2({verbose: false}),
+            new t.zb({verbose: false})
         ];
 
     }
