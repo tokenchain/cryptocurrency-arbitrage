@@ -14,7 +14,7 @@ module.exports = {
          * recording every high profit trade for real account - only confirm that account has control of it.
          */
         let users = await db.select().from('fx_bank').where({bank_code: name}).rows();
-        
+
     },
     exchanges: function () {
         return [
